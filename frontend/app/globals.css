@@ -22,3 +22,20 @@ input:-webkit-autofill:focus {
 .animate-float-delayed {
   animation: float 8s ease-in-out infinite 2s;
 }
+
+@keyframes float-3d {
+    0% { transform: translateY(0px) rotateX(10deg) rotateY(-5deg) rotateZ(2deg); }
+    50% { transform: translateY(-15px) rotateX(10deg) rotateY(-5deg) rotateZ(2deg); }
+    100% { transform: translateY(0px) rotateX(10deg) rotateY(-5deg) rotateZ(2deg); }
+}
+.animate-float-3d { 
+    animation: float-3d 6s ease-in-out infinite; 
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
