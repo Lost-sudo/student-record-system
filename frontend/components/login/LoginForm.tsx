@@ -1,0 +1,130 @@
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import Button from "@/components/ui/Button";
+import InputField from "@/components/ui/InputField";
+
+interface LoginFormValues {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export default function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<LoginFormValues>({
+    defaultValues: { email: "", password: "", rememberMe: false },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Login payload:", data);
+      toast.success("Login successful!", {
+        description: "Redirecting to your dashboard...",
+      });
+      reset();
+    } catch {
+      toast.error("Login failed", {
+        description: "Invalid email or password. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      {/* Email */}
+      <InputField
+        id="email"
+        label="College Email Address"
+        type="email"
+        placeholder="john.doe@university.edu"
+        icon={<Mail className="w-5 h-5 text-slate-400" />}
+        error={errors.email?.message}
+        registration={register("email", {
+          required: "Email is required",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Please enter a valid email address",
+          },
+        })}
+      />
+
+      {/* Password */}
+      <InputField
+        id="password"
+        label="Password"
+        type={showPassword ? "text" : "password"}
+        placeholder="••••••••"
+        icon={<Lock className="w-5 h-5 text-slate-400" />}
+        error={errors.password?.message}
+        action={
+          <button
+            type="button"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+            onClick={() =>
+              toast("Password reset link sent!", {
+                description: "Check your email inbox.",
+              })
+            }
+          >
+            Forgot password?
+          </button>
+        }
+        suffix={
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="text-slate-400 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
+          </button>
+        }
+        registration={register("password", {
+          required: "Password is required",
+          minLength: {
+            value: 6,
+            message: "Password must be at least 6 characters",
+          },
+        })}
+      />
+
+      {/* Remember Me */}
+      <div className="flex items-center pt-2">
+        <label className="flex items-center space-x-2.5 cursor-pointer group">
+          <input
+            type="checkbox"
+            className="w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+            {...register("rememberMe")}
+          />
+          <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">
+            Remember me
+          </span>
+        </label>
+      </div>
+
+      {/* Submit */}
+      <Button type="submit" isLoading={isSubmitting}>
+        Sign In
+      </Button>
+    </form>
+  );
+}
