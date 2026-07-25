@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Toaster } from "sonner";
 
 import type { Metadata } from "next";
 
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   )
