@@ -27,7 +27,7 @@ export class AuthService {
 
         const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
 
-        return {user: this._sanitizeUser(user), ...tokens};
+        return {user: await this._sanitizeUser(user), ...tokens};
     }
 
     async login(email: string, password: string) {
@@ -35,7 +35,7 @@ export class AuthService {
             where: {email}
         });
 
-        if (!user || (await comparePassword(password, user.passwordHash))) {
+        if (!user || (!await comparePassword(password, user.passwordHash))) {
             throw new AppError("Invalid email or password", 401);
         }
 
@@ -49,7 +49,7 @@ export class AuthService {
         });
 
         const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
-        return { user: this._sanitizeUser(user), ...tokens };
+        return { user: await this._sanitizeUser(user), ...tokens };
     }
 
     async refreshTokens(oldRefreshToken: string) {
@@ -92,7 +92,7 @@ export class AuthService {
         const user = await prisma.user.findUnique({ where: { id: userId }});
 
         if (!user) throw new AppError("User not found", 404);
-        return this._sanitizeUser(user);
+        return await this._sanitizeUser(user);
     }
 
     private async _generateAndSaveTokens(userId: string, email: string, role: UserRole) {
