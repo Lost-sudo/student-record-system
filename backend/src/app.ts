@@ -6,7 +6,7 @@ import pinoHttp from "pino-http";
 
 import { logger } from "./config/logger";
 
-import { healthRouter } from "./routes/health.route";
+import routes from "./routes";
 
 const app = express();
 
@@ -23,6 +23,6 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/health", healthRouter);
+app.use("/api", routes);
 
 export default app;
