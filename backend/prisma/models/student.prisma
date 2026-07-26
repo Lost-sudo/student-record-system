@@ -1,6 +1,6 @@
 model Student {
   id            String   @id @default(uuid())
-  userId        String   @unique
+  userId        String?  @unique
   user          User?    @relation(fields: [userId], references: [id])
   studentNumber String   @unique
   firstName     String
