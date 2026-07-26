@@ -1,6 +1,6 @@
 enum EnrollmentStatus {
-    ACTIVE
-    DROPPED
-    COMPLETED
-    WAITLISTED
+  ACTIVE
+  DROPPED
+  COMPLETED
+  WAITLISTED
 }

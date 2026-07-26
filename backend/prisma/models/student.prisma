@@ -1,23 +1,23 @@
 model Student {
-    id  String  @id @default(uuid())
-    userId  String @unique
-    user User? @relation(fields: [userId], references: [id])
-    studentNumber String @unique
-    firstName   String
-    middleName String?
-    lastName String
-    dateOfBirth DateTime
-    gender String?
-    nationality String?
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User?    @relation(fields: [userId], references: [id])
+  studentNumber String   @unique
+  firstName     String
+  middleName    String?
+  lastName      String
+  dateOfBirth   DateTime
+  gender        String?
+  nationality   String?
 
-    deletedAt DateTime?
+  deletedAt DateTime?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    contactInfo ContactInfo?
+  contactInfo       ContactInfo?
+  emergencyContacts EmergencyContact[]
 
-
-    @@index([lastName, firstName])
-    @@index([deletedAt])
+  @@index([lastName, firstName])
+  @@index([deletedAt])
 }
