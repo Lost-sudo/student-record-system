@@ -1,0 +1,7 @@
+enum StudentProgramStatus {
+    ACTIVE
+    GRADUATE
+    WITHDRAWN
+    SUSPENDED
+    TRANSFERRED
+}

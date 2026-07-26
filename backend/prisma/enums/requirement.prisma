@@ -1,0 +1,6 @@
+enum RequirementType {
+    CORE
+    ELECTIVE
+    GENERAL_EDUCATION
+    MAJOR
+}

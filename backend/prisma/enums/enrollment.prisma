@@ -1,0 +1,6 @@
+enum EnrollmentStatus {
+    ACTIVE
+    DROPPED
+    COMPLETED
+    WAITLISTED
+}
