@@ -54,6 +54,20 @@ export const useLogin = () => {
     });
 };
 
+export const useRegister = () => {
+    return useMutation({
+        mutationFn: async (credentials: {email: string, username: string, password: string}) => {
+            const response = await apiClient.post('/auth/register', credentials);
+            return response.data;
+        },
+        onSuccess: (data) => {
+            setAccessToken(data.accessToken);
+
+            queryClient.setQueryData(AUTH_KEYS.user, data.user);
+        }
+    })
+}
+
 export const useLogout = () => {
     return useMutation({
         mutationFn: async () => {

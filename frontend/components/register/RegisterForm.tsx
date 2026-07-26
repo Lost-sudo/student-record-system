@@ -7,6 +7,9 @@ import { Mail, User, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
+import { useRegister } from "@/api/stores/authStore";
+import { ApiError } from "@/types/ApiError";
+import { useRouter } from "next/navigation";
 
 interface RegisterFormValues {
   email: string;
@@ -17,7 +20,10 @@ interface RegisterFormValues {
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const router = useRouter();
+
+  const registerMutation = useRegister();
 
   const {
     register,
@@ -29,21 +35,29 @@ export default function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
-    setIsSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Register payload:", data);
-      toast.success("Account created successfully!", {
-        description: "Please check your email to verify your account.",
-      });
-      reset();
-    } catch {
-      toast.error("Registration failed", {
-        description: "This email or username might already be taken.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    registerMutation.mutate(
+      {email: data.email, username: data.username, password: data.password},
+      {
+        onSuccess: () => {
+          toast.success("Register successful!", {
+            description: "Redirecting to your dashboard..."
+          });
+          reset();
+
+          router.push("/");
+        },
+        onError: (error) => {
+          const axiosError = error as ApiError;
+
+          const errorMessage = 
+            axiosError.response?.data?.message || "The email or username is already registered. Please try again.";
+
+          toast.error("Registration failed.", {
+            description: errorMessage
+          });
+        }
+      }
+    )
   };
 
   return (
@@ -111,11 +125,10 @@ export default function RegisterForm() {
             value: 8,
             message: "Password must be at least 8 characters",
           },
-          pattern: {
-            // Checks for at least one number and one special character
-            value: /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])/,
-            message: "Password must include a number and a special character",
-          },
+          // pattern: {
+          //   value: /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])/,
+          //   message: "Password must include a number and a special character",
+          // },
         })}
       />
 
@@ -148,7 +161,7 @@ export default function RegisterForm() {
       )}
 
       {/* Submit */}
-      <Button type="submit" isLoading={isSubmitting}>
+      <Button type="submit" isLoading={registerMutation.isPending}>
         Create Account
       </Button>
     </form>

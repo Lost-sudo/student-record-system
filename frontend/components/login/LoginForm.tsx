@@ -6,6 +6,9 @@ import { toast } from "sonner";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
+import { useRouter } from "next/navigation";
+import { useLogin } from "@/api/stores/authStore";
+import { ApiError } from "@/types/ApiError";
 
 interface LoginFormValues {
   email: string;
@@ -15,7 +18,9 @@ interface LoginFormValues {
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  const loginMutation = useLogin();
 
   const {
     register,
@@ -27,21 +32,29 @@ export default function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    setIsSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log("Login payload:", data);
-      toast.success("Login successful!", {
-        description: "Redirecting to your dashboard...",
-      });
-      reset();
-    } catch {
-      toast.error("Login failed", {
-        description: "Invalid email or password. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    loginMutation.mutate(
+      {email: data.email, password: data.password},
+      {
+        onSuccess: () => {
+          toast.success('Login successful!', {
+            description: "Redirecting to your dashboard..."
+          });
+          reset();
+
+          router.push("/");
+        },
+        onError: (error) => {
+          const axiosError = error as ApiError;
+
+          const errorMessage = 
+            axiosError.response?.data?.message || "Invalid email or password. Please try again.";
+
+          toast.error("Login failed", {
+            description: errorMessage,
+          });
+        }
+      }
+    )
   };
 
   return (
@@ -122,7 +135,7 @@ export default function LoginForm() {
       </div>
 
       {/* Submit */}
-      <Button type="submit" isLoading={isSubmitting}>
+      <Button type="submit" isLoading={loginMutation.isPending}>
         Sign In
       </Button>
     </form>
