@@ -1,0 +1,7 @@
+enum DegreeType {
+  CERTIFICATE
+  ASSOCIATE
+  BACHELOR
+  MASTER
+  DOCTORATE
+}

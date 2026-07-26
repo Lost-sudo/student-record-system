@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 
 import type { Metadata } from "next";
 
+import QueryProviders from "@/providers/QueryProviders";
 import { env } from "@/config/env";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <QueryProviders>{children}</QueryProviders>
         <Toaster richColors position="top-right" />
       </body>
     </html>

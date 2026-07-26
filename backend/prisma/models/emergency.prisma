@@ -1,0 +1,16 @@
+model EmergencyContact {
+  id        String  @id @default(uuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  name         String
+  relationship String
+  phone        String
+  email        String?
+  isPrimary    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentId])
+}
