@@ -2,7 +2,7 @@ model Student {
   id            String   @id @default(uuid())
   userId        String?  @unique
   user          User?    @relation(fields: [userId], references: [id])
-  studentNumber String   @unique
+  studentNumber String?   @unique
   firstName     String
   middleName    String?
   lastName      String
