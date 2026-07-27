@@ -62,7 +62,7 @@ export class StudentService {
     return newStudent;
   }
 
-  async getStudentById(
+  async getStudents(
     params: GetStudentParams,
   ): Promise<PaginatedStudentResponse> {
     const page = params.page && params.page >= 1 ? params.page : 1;
@@ -103,7 +103,7 @@ export class StudentService {
     };
   }
 
-  async getStudents(studentId: string) {
+  async getStudentById(studentId: string) {
     const student = await prisma.student.findUnique({
       where: {
         id: studentId,
@@ -215,3 +215,5 @@ export class StudentService {
 
 //   async linkUserToStudent() {}
 }
+
+export const studentService = new StudentService();
