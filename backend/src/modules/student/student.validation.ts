@@ -1,18 +1,24 @@
 import { z } from "zod";
 
+const nameSchema = z.string().min(2, "Must be at least 2 characters").max(100, "Must be at most 100 characters");
+
 export const createStudentSchema = z.object({
   body: z.object({
-    firstName: z
-      .string()
-      .min(3, "Student firstname must be atleast 3 characters"),
-    middleName: z
-      .string()
-      .min(3, "Student middlename must be atleast 3 characters")
-      .optional(),
-    lastName: z
-      .string()
-      .min(3, "Student lastname must be atleast 3 characters"),
-    dateOfBirth: z.date("Student date of birth must be a date object"),
+    firstName: nameSchema,
+    middleName: nameSchema.optional(),
+    lastName: nameSchema,
+    dateOfBirth: z.coerce.date({ message: "Student date of birth must be a valid date (ISO 8601 format)" }),
+    gender: z.string().optional(),
+    nationality: z.string().optional(),
+  }),
+});
+
+export const updateStudentSchema = z.object({
+  body: z.object({
+    firstName: nameSchema.optional(),
+    middleName: nameSchema.optional(),
+    lastName: nameSchema.optional(),
+    dateOfBirth: z.coerce.date({ message: "Student date of birth must be a valid date (ISO 8601 format)" }).optional(),
     gender: z.string().optional(),
     nationality: z.string().optional(),
   }),
