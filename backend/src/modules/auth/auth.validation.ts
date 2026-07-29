@@ -3,8 +3,8 @@ import { z } from "zod";
 export const registerSchema = z.object({
     body: z.object({
         email: z.email("Invalid email format"),
-        username: z.string().min(3, "Username must be atleast 3 characters"),
-        password: z.string().min(8, "Password must be atleast 8 characters"),
+        username: z.string().min(3, "Username must be at least 3 characters"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
         role: z.enum(['SUPER_ADMIN', 'REGISTRAR', 'DEPARTMENT_CHAIR', 'FACULTY', 'STUDENT']).optional().default('STUDENT'),
     }),
 });

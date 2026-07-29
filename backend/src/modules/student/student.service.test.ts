@@ -53,7 +53,6 @@ describe("StudentService", () => {
     const studentInput = {
       firstName: "John",
       lastName: "Doe",
-      email: "john.doe@example.com",
       dateOfBirth: new Date(),
       gender: "Male",
       nationality: "Filipino"
@@ -157,7 +156,7 @@ describe("StudentService", () => {
       mockPrisma.student.count.mockResolvedValue(1);
       mockPrisma.student.findMany.mockResolvedValue([mockStudent]);
 
-      const result = await studentService.getStudentById({});
+      const result = await studentService.getStudents({});
 
       expect(mockPrisma.student.count).toHaveBeenCalledWith({
         where: { deletedAt: null },
@@ -181,7 +180,7 @@ describe("StudentService", () => {
       mockPrisma.student.findMany.mockResolvedValue([mockStudent]);
 
       const params = { page: 2, limit: 10, searchQuery: "John" };
-      const result = await studentService.getStudentById(params);
+      const result = await studentService.getStudents(params);
 
       const expectedWhere = {
         deletedAt: null,
@@ -206,7 +205,7 @@ describe("StudentService", () => {
       mockPrisma.student.count.mockResolvedValue(0);
       mockPrisma.student.findMany.mockResolvedValue([]);
 
-      const result = await studentService.getStudentById({ page: -1, limit: 0 });
+      const result = await studentService.getStudents({ page: -1, limit: 0 });
 
       expect(mockPrisma.student.findMany).toHaveBeenCalledWith({
         where: { deletedAt: null },
@@ -228,7 +227,7 @@ describe("StudentService", () => {
       };
       mockPrisma.student.findUnique.mockResolvedValue(studentWithContacts);
 
-      const result = await studentService.getStudents("student-123");
+      const result = await studentService.getStudentById("student-123");
 
       expect(mockPrisma.student.findUnique).toHaveBeenCalledWith({
         where: { id: "student-123" },
@@ -244,8 +243,8 @@ describe("StudentService", () => {
     it("should throw AppError if student is not found", async () => {
       mockPrisma.student.findUnique.mockResolvedValue(null);
 
-      await expect(studentService.getStudents("invalid-id")).rejects.toThrow(AppError);
-      await expect(studentService.getStudents("invalid-id")).rejects.toThrow(
+      await expect(studentService.getStudentById("invalid-id")).rejects.toThrow(AppError);
+      await expect(studentService.getStudentById("invalid-id")).rejects.toThrow(
         "Student not found"
       );
     });

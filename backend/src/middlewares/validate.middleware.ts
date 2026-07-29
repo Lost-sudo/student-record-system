@@ -16,13 +16,22 @@ export const validate = (schema: z.ZodType) => (req: Request, res: Response, nex
         if (parsed.cookies !== undefined) req.cookies = parsed.cookies;
 
         next();
-    } catch (err: any) {
+    } catch (err: unknown) {
         if (err instanceof z.ZodError) {
+            const messages = err.issues.map((issue) => {
+                const path = issue.path.length > 0 ? issue.path.join(".") : "";
+                return path ? `${path}: ${issue.message}` : issue.message;
+            });
+
             return res.status(400).json({
-                success:false,
-                message: "Validation failed",
-                errors: err.issues,
-            })
+                success: false,
+                message: messages.join("; "),
+                errors: err.issues.map((issue) => ({
+                    field: issue.path.join("."),
+                    message: issue.message,
+                    code: issue.code,
+                })),
+            });
         }
 
         next(err);

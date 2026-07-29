@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { authService } from "./auth.service";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { env } from "../../config/env";
