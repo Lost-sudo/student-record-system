@@ -45,9 +45,9 @@ export const updateContactInfo = asyncHandler(async (req: Request, res: Response
 });
 
 export const deleteContactInfo = asyncHandler(async (req: Request, res: Response) => {
-    const { studentId } = req.params;
+    const { id } = req.params;
 
-    const deletedContact = await contactService.deleteContactInfo(studentId as string);
+    const deletedContact = await contactService.deleteContactInfo(id as string);
 
     res.status(200).json({
         success: true,

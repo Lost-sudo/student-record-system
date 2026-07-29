@@ -45,9 +45,9 @@ export class ContactService {
         });
     }
 
-    async deleteContactInfo(studentId: string) {
+    async deleteContactInfo(id: string) {
         const existingContactInfo = await prisma.contactInfo.findUnique({
-            where: { studentId: studentId }
+            where: { id: id }
         })
 
         if (!existingContactInfo) {
@@ -55,7 +55,7 @@ export class ContactService {
         }
 
         return await prisma.contactInfo.delete({
-            where: { studentId: studentId }
+            where: { id: id }
         })
     }
 }

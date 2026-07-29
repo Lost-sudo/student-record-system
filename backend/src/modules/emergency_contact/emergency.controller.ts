@@ -30,3 +30,32 @@ export const getEmergencyContactByStudentId = asyncHandler(async (req: Request, 
         },
     });
 });
+
+export const updateEmergencyContact = asyncHandler(async (req: Request, res: Response)=> {
+    const { studentId } = req.params;
+    const updateEmergencyContactData = req.body;
+
+    const updatedEmergencyContact = await emergencyContactService.updateEmergencyContact(studentId as string, updateEmergencyContactData);
+
+    res.status(200).json({
+        success: true,
+        message: "Emergency contact updated successfully",
+        data: {
+            emergencyContact: updatedEmergencyContact,
+        }
+    });
+});
+
+export const deleteEmergencyContact = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const deletedEmergencyContact = await emergencyContactService.deleteEmergencyContact(id as string);
+
+    res.status(200).json({
+        success: true,
+        message: "Emergency contact deleted successfully",
+        data: {
+            emergencyContact: deletedEmergencyContact,
+        }
+    });
+});
