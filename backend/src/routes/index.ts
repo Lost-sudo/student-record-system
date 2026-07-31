@@ -13,4 +13,5 @@ routes.use("/student", studentRouter);
 routes.use("/contactInfo", contactInfoRoutes);
 routes.use("/emergencyContact", emergencyContactRoutes);
 
+
 export default routes;
