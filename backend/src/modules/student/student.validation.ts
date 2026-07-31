@@ -10,6 +10,7 @@ export const createStudentSchema = z.object({
     dateOfBirth: z.coerce.date({ message: "Student date of birth must be a valid date (ISO 8601 format)" }),
     gender: z.string().optional(),
     nationality: z.string().optional(),
+    userId: z.string().uuid().optional(),
   }),
 });
 

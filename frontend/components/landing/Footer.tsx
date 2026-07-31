@@ -9,21 +9,21 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white py-12">
+    <footer className="border-t border-slate-700 bg-slate-900 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <Logo />
-            <p className="text-sm text-slate-500 mt-4">The next generation of student record management.</p>
+            <p className="text-sm text-slate-400 mt-4">The next generation of student record management.</p>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-sm font-semibold text-slate-800 mb-4">{category}</h4>
-              <ul className="space-y-2 text-sm text-slate-500">
+              <h4 className="text-sm font-semibold text-slate-200 mb-4">{category}</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
                 {links.map((link) => (
                   <li key={link}>
-                    <Link href="#" className="hover:text-indigo-600 transition-colors">
+                    <Link href="#" className="hover:text-indigo-400 transition-colors">
                       {link}
                     </Link>
                   </li>
@@ -33,7 +33,7 @@ export default function Footer() {
           ))}
         </div>
         
-        <div className="border-t border-slate-100 mt-10 pt-8 text-center text-sm text-slate-400">
+        <div className="border-t border-slate-700 mt-10 pt-8 text-center text-sm text-slate-500">
           © 2024 NexusSRS. All rights reserved.
         </div>
       </div>

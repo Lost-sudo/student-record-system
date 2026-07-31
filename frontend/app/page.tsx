@@ -8,7 +8,7 @@ import Footer from "@/components/landing/Footer";
 
 export default function LandingPage() {
   return (
-    <main className="bg-slate-50 font-sans antialiased">
+    <main className="bg-slate-900 font-sans antialiased">
       <Navbar />
       <HeroSection />
       <SocialProofBar />

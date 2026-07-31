@@ -3,13 +3,13 @@ import { UserPlus } from "lucide-react";
 export default function RegisterHeader() {
   return (
     <div className="text-center mb-8">
-      <div className="mx-auto w-16 h-16 bg-indigo-600 rounded-2xl rotate-6 flex items-center justify-center shadow-lg shadow-indigo-200 mb-4 hover:rotate-0 transition-transform duration-300">
+      <div className="mx-auto w-16 h-16 bg-indigo-500 rounded-2xl rotate-6 flex items-center justify-center shadow-lg shadow-indigo-900/30 mb-4 hover:rotate-0 transition-transform duration-300">
         <UserPlus className="w-8 h-8 text-white -rotate-6" />
       </div>
-      <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">
         Create Account
       </h1>
-      <p className="text-slate-500 mt-2 text-sm">
+      <p className="text-slate-300 mt-2 text-sm">
         Set up your Student Portal credentials
       </p>
     </div>

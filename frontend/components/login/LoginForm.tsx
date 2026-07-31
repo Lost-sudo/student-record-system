@@ -40,8 +40,6 @@ export default function LoginForm() {
             description: "Redirecting to your dashboard..."
           });
           reset();
-
-          router.push("/");
         },
         onError: (error) => {
           const axiosError = error as ApiError;
@@ -87,7 +85,7 @@ export default function LoginForm() {
         action={
           <button
             type="button"
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+            className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
             onClick={() =>
               toast("Password reset link sent!", {
                 description: "Check your email inbox.",
@@ -101,7 +99,7 @@ export default function LoginForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-slate-400 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
+            className="text-slate-400 hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? (
@@ -125,10 +123,10 @@ export default function LoginForm() {
         <label className="flex items-center space-x-2.5 cursor-pointer group">
           <input
             type="checkbox"
-            className="w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+            className="w-4 h-4 text-indigo-400 bg-slate-700 border-slate-500 rounded focus:ring-indigo-400 focus:ring-2 cursor-pointer"
             {...register("rememberMe")}
           />
-          <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">
+          <span className="text-sm text-slate-300 group-hover:text-slate-200 transition-colors">
             Remember me
           </span>
         </label>
