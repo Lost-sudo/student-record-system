@@ -31,10 +31,10 @@ export default function Button({
 
   const variants = {
     primary:
-      "bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white shadow-lg shadow-indigo-200 hover:shadow-xl focus:ring-indigo-500",
+      "bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-400 text-white shadow-lg shadow-indigo-900/50 hover:shadow-xl focus:ring-indigo-400",
     outline:
-      "border border-slate-200 hover:border-slate-300 hover:bg-white text-slate-700 focus:ring-slate-300",
-    dark: "bg-slate-900 hover:bg-slate-800 text-white shadow-lg hover:shadow-xl focus:ring-slate-500",
+      "border border-slate-600 hover:border-slate-500 hover:bg-slate-800 text-slate-300 focus:ring-slate-400",
+    dark: "bg-slate-800 hover:bg-slate-700 text-white shadow-lg hover:shadow-xl focus:ring-slate-500",
   };
 
   return (
