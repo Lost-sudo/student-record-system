@@ -30,7 +30,7 @@ export default function InputField({
       {(label || action) && (
         <div className="flex items-center justify-between mb-1.5">
           {label && (
-            <label htmlFor={id} className="block text-sm font-medium text-slate-700">
+            <label htmlFor={id} className="block text-sm font-medium text-slate-300">
               {label}
             </label>
           )}
@@ -49,10 +49,10 @@ export default function InputField({
           type={type}
           placeholder={placeholder}
           aria-invalid={error ? "true" : "false"}
-          className={`w-full py-2.5 bg-slate-50 border rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent focus:bg-white transition duration-200 ${
+          className={`w-full py-2.5 bg-slate-800 border rounded-xl text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent focus:bg-slate-700 transition duration-200 ${
             icon ? "pl-11" : "pl-4"
           } ${suffix ? "pr-12" : "pr-4"} ${
-            error ? "border-red-400 focus:ring-red-500" : "border-slate-200 focus:ring-indigo-500"
+            error ? "border-red-400 focus:ring-red-500" : "border-slate-600 focus:ring-indigo-400"
           }`}
           {...registration}
         />
@@ -62,8 +62,8 @@ export default function InputField({
       </div>
 
       {error && (
-        <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1">
-          <span className="inline-block w-1 h-1 bg-red-500 rounded-full" />
+        <p className="mt-1.5 text-sm text-red-400 flex items-center gap-1">
+          <span className="inline-block w-1 h-1 bg-red-400 rounded-full" />
           {error}
         </p>
       )}

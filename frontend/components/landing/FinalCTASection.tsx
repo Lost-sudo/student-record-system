@@ -1,7 +1,6 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import BackgroundBlobs from "@/components/shared/BackgroundBlobs";
 import { toast } from "sonner";
 
 export default function FinalCTASection() {
