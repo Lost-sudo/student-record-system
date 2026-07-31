@@ -3,11 +3,12 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
-import cookieParser from "cookie-parser"
+import cookieParser from "cookie-parser";
 
 import { logger } from "./config/logger";
 
 import routes from "./routes";
+import { errorHandler } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -26,5 +27,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api", routes);
+
+app.use((_req, res) => {
+    res.status(404).json({
+        success: false,
+        message: "Resource not found",
+    });
+});
+
+app.use(errorHandler);
 
 export default app;

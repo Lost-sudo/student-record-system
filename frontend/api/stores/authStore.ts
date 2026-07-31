@@ -1,6 +1,8 @@
 import { useMutation, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { queryClient } from "../queryClient";
 import apiClient from "../axiosInstance";
+import type { UserData } from "@/types/auth";
+import { getDashboardForRole } from "@/lib/authRedirects";
 
 export const AUTH_KEYS = {
     token: ['auth', 'token'] as const,
@@ -18,13 +20,6 @@ export const setAccessToken = (token: string | null) => {
         queryClient.removeQueries({ queryKey: AUTH_KEYS.token });
     }
 };
-
-export interface UserData {
-    id: string,
-    name: string,
-    email: string,
-    role: string
-}
 
 export const useUserData = (): UseQueryResult<UserData> => {
     const token = getAccessToken();
@@ -50,6 +45,8 @@ export const useLogin = () => {
             setAccessToken(data.accessToken);
 
             queryClient.setQueryData(AUTH_KEYS.user, data.user);
+
+            window.location.href = getDashboardForRole(data.user.role);
         },
     });
 };
@@ -64,6 +61,8 @@ export const useRegister = () => {
             setAccessToken(data.accessToken);
 
             queryClient.setQueryData(AUTH_KEYS.user, data.user);
+
+            window.location.href = getDashboardForRole(data.user.role);
         }
     })
 }

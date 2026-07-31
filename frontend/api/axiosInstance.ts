@@ -48,6 +48,11 @@ apiClient.interceptors.response.use(
 
         if (!originalRequest) return Promise.reject(error);
 
+        if (error.response?.status === 403) {
+            window.location.href = "/403";
+            return Promise.reject(error);
+        }
+
         if (originalRequest._retryCount === undefined) {
             originalRequest._retryCount = 0;
         }
