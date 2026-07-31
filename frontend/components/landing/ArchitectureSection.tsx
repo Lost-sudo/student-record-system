@@ -3,7 +3,7 @@ import ComparisonCard from "./ComparisonCard";
 export default function ArchitectureSection() {
   return (
     <section id="architecture" className="py-24 bg-slate-900 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-900/30 to-transparent" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-linear-to-l from-indigo-900/30 to-transparent" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16">
