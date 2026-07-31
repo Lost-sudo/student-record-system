@@ -3,12 +3,12 @@ import ComparisonCard from "./ComparisonCard";
 export default function ArchitectureSection() {
   return (
     <section id="architecture" className="py-24 bg-slate-900 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-900/20 to-transparent" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-900/30 to-transparent" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">The end of siloed data</h2>
-          <p className="mt-4 text-lg text-slate-400">Stop forcing your admin staff to copy-paste between five different systems.</p>
+          <p className="mt-4 text-lg text-slate-300">Stop forcing your admin staff to copy-paste between five different systems.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">

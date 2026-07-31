@@ -9,7 +9,6 @@ import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
 import { useRegister } from "@/api/stores/authStore";
 import { ApiError } from "@/types/ApiError";
-import { useRouter } from "next/navigation";
 
 interface RegisterFormValues {
   email: string;
@@ -20,8 +19,6 @@ interface RegisterFormValues {
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
-
-  const router = useRouter();
 
   const registerMutation = useRegister();
 
@@ -43,8 +40,6 @@ export default function RegisterForm() {
             description: "Redirecting to your dashboard..."
           });
           reset();
-
-          router.push("/");
         },
         onError: (error) => {
           const axiosError = error as ApiError;
@@ -113,7 +108,7 @@ export default function RegisterForm() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-slate-400 hover:text-indigo-600 transition-colors duration-200 focus:outline-none"
+            className="text-slate-400 hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -137,25 +132,25 @@ export default function RegisterForm() {
         <input
           type="checkbox"
           id="terms"
-          className="mt-0.5 w-4 h-4 text-indigo-600 bg-slate-100 border-slate-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+          className="mt-0.5 w-4 h-4 text-indigo-400 bg-slate-700 border-slate-500 rounded focus:ring-indigo-400 focus:ring-2 cursor-pointer"
           {...register("terms", {
             required: "You must accept the terms to continue",
           })}
         />
-        <label htmlFor="terms" className="text-sm text-slate-600 cursor-pointer">
+        <label htmlFor="terms" className="text-sm text-slate-300 cursor-pointer">
           I agree to the{" "}
-          <Link href="#" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+          <Link href="#" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="#" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+          <Link href="#" className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
             Privacy Policy
           </Link>
         </label>
       </div>
       {errors.terms && (
-        <p className="text-sm text-red-500 flex items-center gap-1 -mt-3">
-          <span className="inline-block w-1 h-1 bg-red-500 rounded-full" />
+        <p className="text-sm text-red-400 flex items-center gap-1 -mt-3">
+          <span className="inline-block w-1 h-1 bg-red-400 rounded-full" />
           {errors.terms.message}
         </p>
       )}

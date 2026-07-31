@@ -27,7 +27,7 @@ export default function SSOSection() {
         variant="outline"
         onClick={() => handleSSO("Apple ID")}
       >
-        <FaApple className="w-5 h-5 text-slate-800" />
+        <FaApple className="w-5 h-5 text-slate-200" />
         <span className="text-sm font-medium">Apple ID</span>
       </Button>
     </div>

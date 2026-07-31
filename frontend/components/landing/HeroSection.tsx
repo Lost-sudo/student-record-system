@@ -14,17 +14,17 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-indigo-100">
-              <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+            <div className="inline-flex items-center gap-2 bg-indigo-900/30 text-indigo-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-indigo-800/50">
+              <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
               NEXT-GEN CAMPUS INFRASTRUCTURE
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-100 leading-tight tracking-tight">
               Student records, <br />
               <span className="text-gradient">finally modernized.</span>
             </h1>
             
-            <p className="mt-6 text-lg text-slate-500 leading-relaxed max-w-lg">
+            <p className="mt-6 text-lg text-slate-300 leading-relaxed max-w-lg">
               Move away from clunky legacy systems. NexusSRS is an API-first, mobile-first platform that turns student data into actionable intelligence, improving retention and reducing administrative overhead.
             </p>
 

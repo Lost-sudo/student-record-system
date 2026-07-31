@@ -48,49 +48,64 @@ apiClient.interceptors.response.use(
 
         if (!originalRequest) return Promise.reject(error);
 
+        if (error.response?.status === 403) {
+            window.location.href = "/403";
+            return Promise.reject(error);
+        }
+
         if (originalRequest._retryCount === undefined) {
             originalRequest._retryCount = 0;
         }
 
-        if (error.response?.status === 401 && originalRequest._retryCount < MAX_RETRIES) {
-            if(isRefreshsing) {
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({ resolve, reject, config: originalRequest });
-                }).then((token) => {
-                    originalRequest.headers.Authorization = `Bearer ${token}`;
-                    return apiClient(originalRequest);
-                });
+        if (error.response?.status === 401) {
+            if (originalRequest.url?.includes('/auth/login')) {
+                return Promise.reject(error);
             }
 
-            originalRequest._retryCount += 1;
-            isRefreshsing = true;
+            if (originalRequest._retryCount === undefined) {
+                originalRequest._retryCount = 0;
+            }
 
-            try {
-                const { data } = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+            if (originalRequest._retryCount < MAX_RETRIES) {
+                if(isRefreshsing) {
+                    return new Promise((resolve, reject) => {
+                        failedQueue.push({ resolve, reject, config: originalRequest });
+                    }).then((token) => {
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                        return apiClient(originalRequest);
+                    });
+                }
 
-                const newAccessToken = data.accessToken;
+                originalRequest._retryCount += 1;
+                isRefreshsing = true;
 
-                setAccessToken(newAccessToken);
+                try {
+                    const { data } = await axios.post(`${apiClient.defaults.baseURL}/auth/refresh`, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
 
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    const newAccessToken = data.accessToken;
 
-                processQueue(null, newAccessToken);
-                isRefreshsing = false;
+                    setAccessToken(newAccessToken);
 
-                return apiClient(originalRequest);
-            } catch (refreshError) {
-                processQueue(refreshError as AxiosError, null);
-                isRefreshsing = false;
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-                setAccessToken(null);
+                    processQueue(null, newAccessToken);
+                    isRefreshsing = false;
 
-                window.location.href = "/login";
+                    return apiClient(originalRequest);
+                } catch (refreshError) {
+                    processQueue(refreshError as AxiosError, null);
+                    isRefreshsing = false;
 
-                return Promise.reject(refreshError);
+                    setAccessToken(null);
+
+                    window.location.href = "/login";
+
+                    return Promise.reject(refreshError);
+                }
             }
         }
         return Promise.reject(error);

@@ -1,11 +1,19 @@
 @import "tailwindcss";
 
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #0f172a;
+}
+
 /* Chrome/Safari Autofill background override */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px #f8fafc inset !important;
-  -webkit-text-fill-color: #1e293b !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -35,7 +43,7 @@ input:-webkit-autofill:focus {
 }
 
 .text-gradient {
-    background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }

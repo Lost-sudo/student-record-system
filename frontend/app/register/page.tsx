@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
+import { getDashboardForRole } from "@/lib/authRedirects";
 import BackgroundBlobs from "@/components/shared/BackgroundBlobs";
 import RegisterHeader from "@/components/register/RegisterHeader";
 import RegisterForm from "@/components/register/RegisterForm";
@@ -7,11 +13,24 @@ import AuthFooter from "@/components/shared/AuthFooter";
 import AIAssistantButton from "@/components/shared/AIAssistantButton";
 
 export default function RegisterPage() {
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user?.role) {
+      router.replace(getDashboardForRole(user.role));
+    }
+  }, [isAuthenticated, isLoading, user, router]);
+
+  if (isLoading || (isAuthenticated && user?.role)) {
+    return null;
+  }
+
   return (
-    <main className="bg-slate-50 font-sans min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+    <main className="bg-slate-900 font-sans min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       <BackgroundBlobs />
 
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md relative z-10 border border-white/20">
+      <div className="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md relative z-10 border border-slate-700/50">
         <RegisterHeader />
         <RegisterForm />
         <FormDivider text="or sign up with" />
