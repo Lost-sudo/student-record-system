@@ -9,7 +9,6 @@ import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
 import { useRegister } from "@/api/stores/authStore";
 import { ApiError } from "@/types/ApiError";
-import { useRouter } from "next/navigation";
 
 interface RegisterFormValues {
   email: string;
@@ -20,8 +19,6 @@ interface RegisterFormValues {
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
-
-  const router = useRouter();
 
   const registerMutation = useRegister();
 
@@ -43,8 +40,6 @@ export default function RegisterForm() {
             description: "Redirecting to your dashboard..."
           });
           reset();
-
-          router.push("/");
         },
         onError: (error) => {
           const axiosError = error as ApiError;

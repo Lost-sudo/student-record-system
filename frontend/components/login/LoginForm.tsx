@@ -40,8 +40,6 @@ export default function LoginForm() {
             description: "Redirecting to your dashboard..."
           });
           reset();
-
-          router.push("/");
         },
         onError: (error) => {
           const axiosError = error as ApiError;

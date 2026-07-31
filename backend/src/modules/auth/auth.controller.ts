@@ -23,10 +23,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     res.status(201).json({
         success: true,
         message: "User registered successfully",
-        data: {
-            user: result.user,
-            accessToken: result.accessToken,
-        }
+        user: result.user,
+        accessToken: result.accessToken,
     });
 });
 
@@ -40,10 +38,9 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Login successful",
-        data: {
-            user: result.user,
-            accessToken: result.accessToken,
-        },
+        user: result.user,
+        accessToken: result.accessToken,
+
     });
 });
 
@@ -57,9 +54,7 @@ export const refresh = asyncHandler(async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Token refresh successfully",
-        data: {
-            accessToken: tokens.accessToken,
-        },
+        accessToken: tokens.accessToken,
     });
 });
 
@@ -70,7 +65,7 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         authService.logout(refreshToken);
     }
 
-    res.clearCookie("refreshToken", { path: "/"});
+    res.clearCookie("refreshToken", { path: "/" });
 
     res.status(200).json({
         success: true,
@@ -83,8 +78,6 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
 
     res.status(200).json({
         success: true,
-        data: {
-            user,
-        },
+        user,
     });
 });

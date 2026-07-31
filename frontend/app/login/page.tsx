@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
+import { getDashboardForRole } from "@/lib/authRedirects";
 import BackgroundBlobs from "@/components/shared/BackgroundBlobs";
 import LoginHeader from "@/components/login/LoginHeader";
 import LoginForm from "@/components/login/LoginForm";
@@ -7,6 +13,19 @@ import AuthFooter from "@/components/shared/AuthFooter";
 import AIAssistantButton from "@/components/shared/AIAssistantButton";
 
 export default function LoginPage() {
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && user?.role) {
+      router.replace(getDashboardForRole(user.role));
+    }
+  }, [isAuthenticated, isLoading, user, router]);
+
+  if (isLoading || (isAuthenticated && user?.role)) {
+    return null;
+  }
+
   return (
     <main className="bg-slate-900 font-sans min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
       <BackgroundBlobs />
