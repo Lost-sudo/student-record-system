@@ -2,8 +2,14 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { notifications } from '@/lib/data';
+import { Breadcrumb } from '@/lib/types';
+import Link from 'next/link';
 
-export default function Header() {
+interface HeaderProps {
+  breadcrumbs: Breadcrumb[];
+}
+
+export default function Header({ breadcrumbs }: HeaderProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -41,11 +47,22 @@ export default function Header() {
       <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm">
-          <a href="#" className="text-slate-400 hover:text-indigo-400 transition-colors">Home</a>
-          <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-          </svg>
-          <span className="text-slate-200 font-medium">Dashboard</span>
+          {breadcrumbs.map((crumb, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              {idx > 0 && (
+                <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              )}
+              {crumb.href ? (
+                <Link href={crumb.href} className="text-slate-400 hover:text-indigo-400 transition-colors">
+                  {crumb.label}
+                </Link>
+              ) : (
+                <span className="text-slate-200 font-medium">{crumb.label}</span>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Right side */}

@@ -1,6 +1,11 @@
 import { Sidebar, Header, KPICards, AlertsPanel, DemographicsPanel, ActivityFeed } from '@/components/dashboard';
 import { AmbientBackground } from '@/components/ui';
 
+const breadcrumbs = [
+    { label: 'Home', href: '/' },
+    { label: 'Dashboard' },
+];
+
 export default function DashboardPage() {
   return (
     <div className="text-slate-200 min-h-screen">
@@ -10,7 +15,7 @@ export default function DashboardPage() {
         <Sidebar />
         
         <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
-          <Header />
+          <Header breadcrumbs={breadcrumbs}/>
           
           <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 lg:py-8 max-w-[1600px] mx-auto w-full">
             {/* Welcome Section */}
