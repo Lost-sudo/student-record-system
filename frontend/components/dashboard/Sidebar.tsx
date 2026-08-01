@@ -16,10 +16,21 @@ function NavButton({ item }: NavButtonProps) {
   const pathname = usePathname();
 
   const isActive = item.href
-    ? pathname === item.href || pathname.startsWith(item.href + '/')
+    ? pathname === item.href || pathname === item.href + '/'
     : item.submenu?.some(
         (sub) => pathname === sub.href || pathname.startsWith(sub.href + '/')
       );
+
+  const activeSubHref = item.submenu
+    ? item.submenu
+        .filter(
+          (sub) => pathname === sub.href || pathname.startsWith(sub.href + '/')
+        )
+        .reduce(
+          (longest, sub) => (sub.href.length > longest.length ? sub.href : longest),
+          ''
+        )
+    : '';
 
   if (item.href && !item.submenu) {
     return (
@@ -70,8 +81,7 @@ function NavButton({ item }: NavButtonProps) {
           className={`submenu mt-1 ml-4 pl-4 border-l border-slate-700/50 space-y-1 ${isOpen || isActive ? "open" : ""}`}
         >
           {item.submenu.map((sub, idx) => {
-            const isSubActive =
-              pathname === sub.href || pathname.startsWith(sub.href + '/');
+            const isSubActive = sub.href === activeSubHref;
 
             return (
               <Link

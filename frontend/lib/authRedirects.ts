@@ -5,7 +5,7 @@ export const getDashboardForRole = (role: UserRole): string => {
     case "SUPER_ADMIN":
       return "/dashboard";
     case "REGISTRAR":
-      return "/dashboard";
+      return "/registrar";
     default:
       return "/";
   }
