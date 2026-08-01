@@ -35,7 +35,7 @@ export class ContactService {
 
         if (!existingContactInfo) {
             throw new AppError("Contact not found", 404);
-        }
+        }   
 
         return await prisma.contactInfo.update({
             where: { studentId: studentId },
