@@ -22,8 +22,8 @@ export const navItems: NavItem[] = [
     label: 'Student Records', 
     icon: <Users className="w-5 h-5 text-cyan-400" />,
     submenu: [
-      { label: 'All Active Students', href: '/registrar/students' },
-      { label: 'Archived / Deleted', href: '/registrar/students/archived' },
+      { label: 'All Active Students', href: '/students' },
+      { label: 'Archived / Deleted', href: '/students/archived' },
     ]
   },
   { label: 'Reports & Analytics', href: '#', icon: <BarChart3 className="w-5 h-5 text-purple-400" /> },

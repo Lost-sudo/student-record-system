@@ -1,4 +1,7 @@
-import { Sidebar, Header, KPICards, AlertsPanel, DemographicsPanel, ActivityFeed } from '@/components/dashboard';
+'use client';
+
+import { useState } from 'react';
+import { Sidebar, Header, KPICards, AlertsPanel, DemographicsPanel, ActivityFeed, AddStudentModal } from '@/components/dashboard';
 import { AmbientBackground } from '@/components/ui';
 
 const breadcrumbs = [
@@ -7,6 +10,8 @@ const breadcrumbs = [
 ];
 
 export default function DashboardPage() {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   return (
     <div className="text-slate-200 min-h-screen">
       <AmbientBackground />
@@ -30,7 +35,10 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <button className="px-6 py-3 text-sm font-semibold rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-900/50 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 active:scale-[0.98] transition-all duration-200 flex items-center gap-2">
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="px-6 py-3 text-sm font-semibold rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-900/50 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 active:scale-[0.98] transition-all duration-200 flex items-center gap-2"
+                >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
                   </svg>
@@ -73,6 +81,11 @@ export default function DashboardPage() {
           </main>
         </div>
       </div>
+
+      <AddStudentModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 }
