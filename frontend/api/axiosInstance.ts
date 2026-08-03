@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { getAccessToken, setAccessToken } from './stores/authStore';
+import { queryClient } from './queryClient';
 
 const MAX_RETRIES = 3;
 
@@ -62,6 +63,10 @@ apiClient.interceptors.response.use(
                 return Promise.reject(error);
             }
 
+            if (originalRequest.url?.includes('/auth/refresh')) {
+                return Promise.reject(error);
+            }
+
             if (originalRequest._retryCount === undefined) {
                 originalRequest._retryCount = 0;
             }
@@ -89,6 +94,7 @@ apiClient.interceptors.response.use(
                     const newAccessToken = data.accessToken;
 
                     setAccessToken(newAccessToken);
+                    queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
 
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
