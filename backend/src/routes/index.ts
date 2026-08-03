@@ -9,7 +9,7 @@ const routes = Router();
 
 routes.use("/health", healthRouter);
 routes.use("/auth", authRouter);
-routes.use("/student", studentRouter);
+routes.use("/students", studentRouter);
 routes.use("/contactInfo", contactInfoRoutes);
 routes.use("/emergencyContact", emergencyContactRoutes);
 

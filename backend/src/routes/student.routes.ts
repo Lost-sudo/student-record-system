@@ -9,9 +9,9 @@ const router = Router();
 router.use(authenticate)
 
 router.post("/", validate(createStudentSchema), authorize("REGISTRAR", "SUPER_ADMIN"), studentController.createStudent);
-router.get("/", studentController.getStudents);
-router.get("/:id", studentController.getStudentById);
-router.patch("/:id", validate(updateStudentSchema), authorize("REGISTRAR", "SUPER_ADMIN"), studentController.updateStudent);
+router.get("/", authorize("REGISTRAR", "SUPER_ADMIN"), studentController.getStudents);
+router.get("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), studentController.getStudentById);
+router.patch("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), validate(updateStudentSchema), authorize("REGISTRAR", "SUPER_ADMIN"), studentController.updateStudent);
 router.delete("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), studentController.softDeleteStudent);
 
 export default router;

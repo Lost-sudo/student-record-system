@@ -11,10 +11,10 @@ const router = Router();
 
 router.use(authenticate)
 
-router.post("/", validate(createEmergencyContactSchema), emergencyContactController.createEmergencyContact);
-router.get("/", emergencyContactController.getEmergencyContactByStudentId);
 router.get("/:studentId", emergencyContactController.getEmergencyContactByStudentId);
-router.patch("/:studentId", validate(updateEmergencyContactSchema), emergencyContactController.updateEmergencyContact);
-router.delete("/:id", emergencyContactController.deleteEmergencyContact);
+router.get("/", emergencyContactController.getEmergencyContactByStudentId);
+router.post("/:studentId", authorize("REGISTRAR", "SUPER_ADMIN"), validate(createEmergencyContactSchema), emergencyContactController.createEmergencyContact);
+router.patch("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), validate(updateEmergencyContactSchema), emergencyContactController.updateEmergencyContact);
+router.delete("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), emergencyContactController.deleteEmergencyContact);
 
 export default router;

@@ -35,6 +35,7 @@ export const updateContactInfo = asyncHandler(async (req: Request, res: Response
     const updateData = req.body;
 
     const updatedContactInfo = await contactService.updateContactInfo(studentId as string, updateData);
+
     res.status(200).json({
         success: true,
         message: "Contact updated successfully",
