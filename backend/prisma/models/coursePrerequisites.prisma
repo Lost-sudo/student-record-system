@@ -1,0 +1,14 @@
+model CoursePrerequisite {
+  id               String   @id @default(uuid())
+  courseId           String
+  course             Course   @relation("PrerequisiteCourse", fields: [courseId], references: [id], onDelete: Cascade)
+  
+  prerequisiteId     String
+  prerequisite       Course   @relation("RequiredCourse", fields: [prerequisiteId], references: [id], onDelete: Cascade)
+
+  createdAt          DateTime @default(now())
+
+  @@unique([courseId, prerequisiteId])
+  @@index([courseId])
+  @@index([prerequisiteId])
+}

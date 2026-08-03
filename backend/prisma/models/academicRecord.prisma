@@ -1,0 +1,13 @@
+model AcademicRecord {
+  id             String     @id @default(uuid())
+  enrollmentId   String     @unique
+  enrollment     Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  
+  grade          String?  
+  gradePoints    Float?   
+  earnedCredits  Int?
+  isFinalized    Boolean    @default(false)
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}

@@ -1,0 +1,16 @@
+model DegreeRequirement {
+  id              String            @id @default(uuid())
+  curriculumId    String
+  curriculum      CurriculumVersion @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  
+  requirementType RequirementType
+  minCredits      Int               @default(0)
+  
+  courseId        String?
+  course        Course?             @relation(fields: [courseId], references: [id], onDelete: Restrict)
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([curriculumId])
+}

@@ -1,0 +1,17 @@
+model Course {
+    id String @id @default(uuid())
+    courseCode String @unique
+    title String
+    description String?
+    defaultCredits Int
+    isActive Boolean @default(true)
+
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    
+    courseSections CourseSection[]
+    degreeRequirements DegreeRequirement[]
+    prerequisites CoursePrerequisite[] @relation("PrerequisiteCourse")
+    requiredFor CoursePrerequisite[] @relation("RequiredCourse")
+}
