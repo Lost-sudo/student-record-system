@@ -5,6 +5,8 @@ html {
 }
 
 body {
+  font-family: 'Inter', system-ui, -apply-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
   background-color: #0f172a;
 }
 
@@ -46,4 +48,61 @@ input:-webkit-autofill:focus {
     background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass {
+  background: rgba(30, 41, 50, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track:hover {
+  background: #475569;
+}
+
+.submenu { 
+  max-height: 0; 
+  overflow: hidden; 
+  transition: max-height 0.3s ease; 
+}
+
+.submenu.open { 
+  max-height: 200px; 
+}
+
+.rotate-90 { 
+  transform: rotate(90deg); 
+}
+
+.transition-rotate { 
+  transition: transform 0.3s ease; 
+}
+
+input:-webkit-autofill { 
+  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset; 
+  -webkit-text-fill-color: #e2e8f0; 
+}
+
+.checkbox-custom {
+  accent-color: #6366f1;
 }
