@@ -1,3 +1,5 @@
+import { AlertTriangle } from "lucide-react";
+
 interface AlertItem {
   color: string;
   dotColor: string;
@@ -48,7 +50,7 @@ export default function AlertsPanel() {
       <div className="px-6 py-5 border-b border-slate-700/50 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <span>⚠️</span> Action Required: Incomplete Records
+            <AlertTriangle className="w-5 h-5 text-amber-400" /> Action Required: Incomplete Records
           </h2>
           <p className="text-xs text-slate-400 mt-1">Records that need your immediate attention</p>
         </div>

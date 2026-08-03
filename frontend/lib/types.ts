@@ -11,7 +11,7 @@ export interface StudentActivity {
 }
 
 export interface Notification {
-  icon: string;
+  icon: ReactNode;
   title: string;
   description: string;
   timestamp: string;

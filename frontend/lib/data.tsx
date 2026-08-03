@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, BarChart3, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Settings, AlertCircle, AlertTriangle } from "lucide-react";
 import { StudentActivity, Notification, NavItem, Student, ArchivedStudent } from './types';
 
 export const activities: StudentActivity[] = [
@@ -11,9 +11,9 @@ export const activities: StudentActivity[] = [
 ];
 
 export const notifications: Notification[] = [
-  { icon: '🔴', title: '23 students missing Emergency Contacts', description: 'Action required', timestamp: '2h ago' },
-  { icon: '🟡', title: '15 students missing Personal Contact Info', description: 'Action required', timestamp: '5h ago' },
-  { icon: '🟠', title: '8 Emergency Contacts have missing phone/email', description: 'Action required', timestamp: '1d ago' },
+  { icon: <AlertCircle className="w-5 h-5 text-red-400" />, title: '23 students missing Emergency Contacts', description: 'Action required', timestamp: '2h ago' },
+  { icon: <AlertTriangle className="w-5 h-5 text-yellow-400" />, title: '15 students missing Personal Contact Info', description: 'Action required', timestamp: '5h ago' },
+  { icon: <AlertTriangle className="w-5 h-5 text-orange-400" />, title: '8 Emergency Contacts have missing phone/email', description: 'Action required', timestamp: '1d ago' },
 ];
 
 export const navItems: NavItem[] = [

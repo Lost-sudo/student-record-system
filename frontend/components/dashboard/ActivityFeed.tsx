@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Clock } from 'lucide-react';
 import { activities } from '@/lib/data';
 import { StudentActivity } from '@/lib/types';
 
@@ -38,7 +39,7 @@ export default function ActivityFeed() {
       <div className="px-6 py-5 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <span>🕒</span> Recent Activity
+            <Clock className="w-5 h-5 text-slate-400" /> Recent Activity
           </h2>
           <p className="text-xs text-slate-400 mt-1">Chronological log of system events</p>
         </div>
