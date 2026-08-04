@@ -1,4 +1,3 @@
-import { th } from 'zod/v4/locales/index.js';
 import { AcademicProgram, Prisma, PrismaClient } from '../../../generated/prisma/client';
 import { AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator';
 
