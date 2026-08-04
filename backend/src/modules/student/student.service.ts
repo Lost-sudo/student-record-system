@@ -1,199 +1,102 @@
-import { prisma } from "../../database/prisma";
-import { Prisma } from "../../generated/prisma/client";
+import { Student } from "../../generated/prisma/client";
 import { AppError } from "../../middlewares/error.middleware";
-import { GetStudentParams, PaginatedStudentResponse } from "./student.types";
+import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination";
+import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator";
+import { StudentDto } from "./student.types";
+import { StudentRepository } from "./student.repository";
 
 export class StudentService {
-  async createStudent(
-    data: Prisma.StudentUncheckedCreateInput,
-    userId?: string,
-  ) {
-    if (userId) {
-      const existingUserLink = await prisma.student.findFirst({
-        where: { userId: userId, deletedAt: null },
-      });
+  constructor(private readonly studentRepository: StudentRepository) {}
 
+  private normalizePagination(query: Partial<StudentQueryInput>): StudentQueryInput {
+    const page = Number.isInteger(query.page) && query.page && query.page > 0 ? query.page : 1;
+    const limit = Number.isInteger(query.limit) && query.limit && query.limit > 0 ? query.limit : 20;
+
+    return {
+      page,
+      limit,
+      searchQuery: query.searchQuery,
+    };
+  }
+
+  async create(input: CreateStudentInput, userId?: string): Promise<StudentDto> {
+    if (userId) {
+      const existingUserLink = await this.studentRepository.findLinkedStudentByUserId(userId);
       if (existingUserLink) {
-        throw new AppError(
-          "This user account is already linked to another student",
-          409,
-        );
+        throw new AppError("This user account is already linked to another student", 409);
       }
     }
 
-    const newStudent = await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
-        const prefix = "STU";
-        const currentYear = new Date().getFullYear();
-        const searchPrefix = `${prefix}-${currentYear}-`;
+    const newStudent = await this.studentRepository.createWithGeneratedNumber(input, userId);
+    return this.toDto(newStudent);
+  }
 
-        const latestStudent = await tx.student.findFirst({
-          where: {
-            studentNumber: { startsWith: searchPrefix },
-            deletedAt: null,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          select: {
-            studentNumber: true,
-          },
-        });
+  async createStudent(input: CreateStudentInput, userId?: string): Promise<StudentDto> {
+    return this.create(input, userId);
+  }
 
-        let nextSequence = 1;
-        if (latestStudent && latestStudent.studentNumber) {
-          const parts = latestStudent.studentNumber.split("-");
-          const lastNumber = parseInt(parts[2], 10);
-          nextSequence = lastNumber + 1;
-        }
-
-        const generatedStudentNumber = `${searchPrefix}${String(nextSequence).padStart(4, "0")}`;
-
-        return await tx.student.create({
-          data: {
-            ...data,
-            studentNumber: generatedStudentNumber,
-            userId: userId || undefined,
-          },
-        });
-      },
-    );
-
-    return newStudent;
+  async list(query: StudentQueryInput): Promise<{ items: StudentDto[]; meta: PaginationMeta }> {
+    const { items, total } = await this.studentRepository.findMany(query);
+    return {
+      items: items.map((item) => this.toDto(item)),
+      meta: buildPaginationMeta(query.page, query.limit, total),
+    };
   }
 
   async getStudents(
-    params: GetStudentParams,
-  ): Promise<PaginatedStudentResponse> {
-    const page = params.page && params.page >= 1 ? params.page : 1;
-    const limit = params.limit && params.limit > 0 ? params.limit : 20;
-
-    const skip = (page - 1) * limit;
-    const take = limit;
-
-    const where: Prisma.StudentWhereInput = {
-      deletedAt: null,
-    };
-
-    if (params.searchQuery && params.searchQuery.trim() !== "") {
-      where.OR = [
-        { firstName: { contains: params.searchQuery, mode: "insensitive" } },
-        { lastName: { contains: params.searchQuery, mode: "insensitive" } },
-        { lastName: { contains: params.searchQuery, mode: "insensitive" } },
-      ];
-    }
-
-    const [total, data] = await Promise.all([
-      prisma.student.count({ where }),
-      prisma.student.findMany({
-        where,
-        skip,
-        take,
-        orderBy: { createdAt: "desc" },
-      }),
-    ]);
-
-    const totalPages = Math.ceil(total / limit);
-
+    query: Partial<StudentQueryInput>,
+  ): Promise<{ data: StudentDto[]; total: number; page: number; totalPages: number }> {
+    const normalizedQuery = this.normalizePagination(query);
+    const result = await this.list(normalizedQuery);
     return {
-      data,
-      total,
-      page,
-      totalPages,
+      data: result.items,
+      total: result.meta.total,
+      page: result.meta.page,
+      totalPages: result.meta.totalPages,
     };
   }
 
-  async getStudentById(studentId: string) {
-    const student = await prisma.student.findUnique({
-      where: {
-        id: studentId,
-      },
-      include: {
-        emergencyContacts: {
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-      },
-    });
+  async getById(studentId: string): Promise<StudentDto> {
+    const student = await this.studentRepository.findById(studentId);
 
     if (!student) {
       throw new AppError("Student not found", 404);
     }
 
-    return student;
+    return this.toDto(student);
   }
 
-  async updateStudent(
-    studentId: string,
-    updateData: Prisma.StudentUncheckedUpdateInput,
-  ) {
-    const existingUser = await prisma.student.findUnique({
-      where: { id: studentId },
-    });
-
-    if (!existingUser) {
-      throw new AppError("Student not found", 404);
-    }
-
-    const validationChecks: Promise<void>[] = [];
-
-    if (updateData.studentNumber) {
-      validationChecks.push(
-        prisma.student
-          .findFirst({
-            where: {
-              studentNumber: updateData.studentNumber as string,
-              id: { not: studentId },
-              deletedAt: null,
-            },
-          })
-          .then((result: unknown) => {
-            if (result)
-              throw new AppError(
-                "Student number is already taken by another student",
-                409,
-              );
-          }),
-      );
-    }
-
-    if (updateData.userId) {
-      validationChecks.push(
-        prisma.student
-          .findFirst({
-            where: {
-              userId: updateData.userId as string,
-              id: { not: studentId },
-              deletedAt: null,
-            },
-          })
-          .then((result: unknown) => {
-            if (result)
-              throw new AppError(
-                "This user account is already linked to another student",
-                409,
-              );
-          }),
-      );
-    }
-
-    if (validationChecks.length > 0) {
-      await Promise.all(validationChecks);
-    }
-
-    const updatedStudent = await prisma.student.update({
-      where: { id: studentId },
-      data: updateData,
-    });
-
-    return updatedStudent;
+  async getStudentById(studentId: string): Promise<StudentDto> {
+    return this.getById(studentId);
   }
 
-  async softDeleteStudent(studentId: string) {
-    const existingStudent = await prisma.student.findUnique({
-      where: { id: studentId },
-    });
+  async update(studentId: string, input: UpdateStudentInput): Promise<StudentDto> {
+    await this.getById(studentId);
+
+    if (input.studentNumber) {
+      const duplicateStudentNumber = await this.studentRepository.findDuplicateStudentNumber(input.studentNumber, studentId);
+      if (duplicateStudentNumber) {
+        throw new AppError("Student number is already taken by another student", 409);
+      }
+    }
+
+    if (input.userId) {
+      const duplicateUserId = await this.studentRepository.findDuplicateUserId(input.userId, studentId);
+      if (duplicateUserId) {
+        throw new AppError("This user account is already linked to another student", 409);
+      }
+    }
+
+    const updated = await this.studentRepository.update(studentId, input);
+    return this.toDto(updated);
+  }
+
+  async updateStudent(studentId: string, input: UpdateStudentInput): Promise<StudentDto> {
+    return this.update(studentId, input);
+  }
+
+  async delete(studentId: string): Promise<StudentDto> {
+    const existingStudent = await this.studentRepository.findExistingById(studentId);
 
     if (!existingStudent) {
       throw new AppError("Student not found", 404);
@@ -203,17 +106,28 @@ export class StudentService {
       throw new AppError("Student already deleted", 400);
     }
 
-    const updateStudent = await prisma.student.update({
-      where: { id: studentId },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-
-    return updateStudent;
+    const deleted = await this.studentRepository.delete(studentId);
+    return this.toDto(deleted);
   }
 
-//   async linkUserToStudent() {}
-}
+  async softDeleteStudent(studentId: string): Promise<StudentDto> {
+    return this.delete(studentId);
+  }
 
-export const studentService = new StudentService();
+  private toDto(model: Student): StudentDto {
+    return {
+      id: model.id,
+      userId: model.userId,
+      studentNumber: model.studentNumber,
+      firstName: model.firstName,
+      middleName: model.middleName,
+      lastName: model.lastName,
+      dateOfBirth: model.dateOfBirth,
+      gender: model.gender,
+      nationality: model.nationality,
+      deletedAt: model.deletedAt,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt,
+    };
+  }
+}

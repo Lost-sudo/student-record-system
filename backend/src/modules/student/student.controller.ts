@@ -1,71 +1,65 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { studentService } from "./student.service";
+import { uuidSchema } from "../../utils/zod";
+import { studentQuerySchema, createStudentSchema, updateStudentSchema } from "./student.validator";
+import { StudentService } from "./student.service";
 
-export const createStudent = asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.body;
-    const studentData = req.body;
+export class StudentController {
+  constructor(private readonly service: StudentService) {}
 
-    const newStudent = await studentService.createStudent(studentData, userId);
+  createStudent = asyncHandler(async (req: Request, res: Response) => {
+    const input = createStudentSchema.parse(req.body);
+    const data = await this.service.create(input, input.userId);
 
-    res.status(201).json({
-        success: true,
-        message: "Student creation successful",
-        data: {
-            student: newStudent,
-        },
+    return res.status(201).json({
+      success: true,
+      message: "Student creation successful",
+      data,
     });
-});
+  });
 
-export const getStudents = asyncHandler(async (req: Request, res: Response) => {
-    const page = req.query.page ? parseInt(req.query.page as string, 10) : undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
-    const searchQuery = req.query.search as string | undefined;
+  getStudents = asyncHandler(async (req: Request, res: Response) => {
+    const query = studentQuerySchema.parse(req.query);
+    const result = await this.service.list(query);
 
-    const result = await studentService.getStudents({ page, limit, searchQuery });
-
-    res.status(200).json({
-        success: true,
-        message: "Students fetched successfully",
-        data: {
-            students: result,
-        }
+    return res.status(200).json({
+      success: true,
+      message: "Students fetched successfully",
+      data: result.items,
+      meta: result.meta,
     });
-});
+  });
 
-export const getStudentById = asyncHandler(async (req: Request, res: Response) => {
-    const student = await studentService.getStudentById(req.params.id as string);
+  getStudentById = asyncHandler(async (req: Request, res: Response) => {
+    const id = uuidSchema.parse(req.params.id);
+    const student = await this.service.getById(id);
 
-    res.status(200).json({
-        success: true,
-        message: "Student fetched successfully",
-        data: {
-            student: student,
-        },
+    return res.status(200).json({
+      success: true,
+      message: "Student fetched successfully",
+      data: student,
     });
-});
+  });
 
-export const updateStudent = asyncHandler(async (req: Request, res: Response) => {
-    const updatedStudent = await studentService.updateStudent(req.params.id as string, req.body);
+  updateStudent = asyncHandler(async (req: Request, res: Response) => {
+    const id = uuidSchema.parse(req.params.id);
+    const input = updateStudentSchema.parse(req.body);
+    const updatedStudent = await this.service.update(id, input);
 
-    res.status(200).json({
-        success: true,
-        message: "Student updated successfully",
-        data: {
-            student: updatedStudent,
-        },
+    return res.status(200).json({
+      success: true,
+      message: "Student updated successfully",
+      data: updatedStudent,
     });
-});
+  });
 
-export const softDeleteStudent = asyncHandler(async (req: Request, res: Response) => {
-    const deletedStudent = await studentService.softDeleteStudent(req.params.id as string);
+  softDeleteStudent = asyncHandler(async (req: Request, res: Response) => {
+    const id = uuidSchema.parse(req.params.id);
+    await this.service.delete(id);
 
-    res.status(200).json({
-        success: true,
-        message: "Student deleted successfully",
-        data: {
-            student: deletedStudent,
-        },
+    return res.status(200).json({
+      success: true,
+      message: "Student deleted successfully",
     });
-});
-
+  });
+}

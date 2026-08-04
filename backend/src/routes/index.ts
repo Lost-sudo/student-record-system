@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { healthRouter } from "./health.route";
 import authRouter from "./auth.routes";
-import studentRouter from "./student.routes";
 import contactInfoRoutes from "./contactInfo.routes";
 import emergencyContactRoutes from "./emergencyContact.routes";
+import { studentRouter } from '../modules/student/student.routes';
 
 const routes = Router();
 
