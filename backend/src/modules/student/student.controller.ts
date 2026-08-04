@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { uuidSchema } from "../../utils/zod";
+import { uuidParamsSchema } from "../../utils/zod";
 import { studentQuerySchema, createStudentSchema, updateStudentSchema } from "./student.validator";
 import { StudentService } from "./student.service";
 
@@ -31,7 +31,7 @@ export class StudentController {
   });
 
   getStudentById = asyncHandler(async (req: Request, res: Response) => {
-    const id = uuidSchema.parse(req.params.id);
+    const { id } = uuidParamsSchema.parse(req.params);
     const student = await this.service.getById(id);
 
     return res.status(200).json({
@@ -42,7 +42,7 @@ export class StudentController {
   });
 
   updateStudent = asyncHandler(async (req: Request, res: Response) => {
-    const id = uuidSchema.parse(req.params.id);
+    const { id } = uuidParamsSchema.parse(req.params);
     const input = updateStudentSchema.parse(req.body);
     const updatedStudent = await this.service.update(id, input);
 
@@ -54,7 +54,7 @@ export class StudentController {
   });
 
   softDeleteStudent = asyncHandler(async (req: Request, res: Response) => {
-    const id = uuidSchema.parse(req.params.id);
+    const { id } = uuidParamsSchema.parse(req.params);
     await this.service.delete(id);
 
     return res.status(200).json({

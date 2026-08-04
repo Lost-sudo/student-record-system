@@ -1,63 +1,47 @@
-import { prisma } from "../../database/prisma";
-import {CreateContactInfo, UpdateContactInfo} from "./contact.types";
-import {AppError} from "../../middlewares/error.middleware";
+import { AppError } from "../../middlewares/error.middleware";
+import { ContactRepository } from "./contact.repository";
+import { CreateContactInfo, UpdateContactInfo } from "./contact.types";
 
 export class ContactService {
-    async createContactInfo(studentId: string, data: CreateContactInfo) {
-        const student = await prisma.student.findUnique({ where: { id: studentId } });
+  constructor(private readonly contactRepository: ContactRepository) {}
 
-        if (!student) {
-            throw new AppError("Student not found", 404);
-        }
+  async createContactInfo(studentId: string, data: CreateContactInfo) {
+    const student = await this.contactRepository.findStudentById(studentId);
 
-        const existingContactInfo = await prisma.contactInfo.findUnique({
-            where: { studentId: studentId },
-        });
-
-        if (existingContactInfo) {
-            throw new AppError("Contact info already exist for this student. Use update instead", 409);
-        }
-
-        return await prisma.contactInfo.create({
-            data: {
-                ...data,
-                studentId: studentId,
-            }
-        });
+    if (!student) {
+      throw new AppError("Student not found", 404);
     }
 
-    async getContactInfoByStudentId(studentId: string) {
-        return await prisma.contactInfo.findUnique({ where: { studentId: studentId } });
+    const existingContactInfo = await this.contactRepository.findByStudentId(studentId);
+
+    if (existingContactInfo) {
+      throw new AppError("Contact info already exist for this student. Use update instead", 409);
     }
 
-    async updateContactInfo(studentId: string, data: UpdateContactInfo) {
-        const existingContactInfo = await prisma.contactInfo.findUnique({ where: { studentId: studentId }});
+    return this.contactRepository.create(studentId, data);
+  }
 
-        if (!existingContactInfo) {
-            throw new AppError("Contact not found", 404);
-        }   
+  async getContactInfoByStudentId(studentId: string) {
+    return this.contactRepository.findByStudentId(studentId);
+  }
 
-        return await prisma.contactInfo.update({
-            where: { studentId: studentId },
-            data: {
-                ...data,
-            }
-        });
+  async updateContactInfo(studentId: string, data: UpdateContactInfo) {
+    const existingContactInfo = await this.contactRepository.findByStudentId(studentId);
+
+    if (!existingContactInfo) {
+      throw new AppError("Contact not found", 404);
     }
 
-    async deleteContactInfo(id: string) {
-        const existingContactInfo = await prisma.contactInfo.findUnique({
-            where: { id: id }
-        })
+    return this.contactRepository.updateByStudentId(studentId, data);
+  }
 
-        if (!existingContactInfo) {
-            throw new AppError("Contact not found", 404);
-        }
+  async deleteContactInfo(id: string) {
+    const existingContactInfo = await this.contactRepository.findById(id);
 
-        return await prisma.contactInfo.delete({
-            where: { id: id }
-        })
+    if (!existingContactInfo) {
+      throw new AppError("Contact not found", 404);
     }
+
+    return this.contactRepository.deleteById(id);
+  }
 }
-
-export const contactService = new ContactService();

@@ -1,16 +1,16 @@
 import { Router } from "express";
 import { healthRouter } from "./health.route";
 import authRouter from "./auth.routes";
-import contactInfoRoutes from "./contactInfo.routes";
-import emergencyContactRoutes from "./emergencyContact.routes";
-import { studentRouter } from '../modules/student/student.routes';
+import { studentRouter } from "../modules/student/student.routes";
+import contactRoutes from "../modules/contact/contact.routes";
+import emergencyContactRoutes from "../modules/emergency-contact/emergency-contact.routes";
 
 const routes = Router();
 
 routes.use("/health", healthRouter);
 routes.use("/auth", authRouter);
 routes.use("/students", studentRouter);
-routes.use("/contactInfo", contactInfoRoutes);
+routes.use("/contactInfo", contactRoutes);
 routes.use("/emergencyContact", emergencyContactRoutes);
 
 
