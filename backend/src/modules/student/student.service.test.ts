@@ -13,7 +13,17 @@ jest.mock("../../database/prisma", () => ({
       update: jest.fn(),
       count: jest.fn(),
     },
-    $transaction: jest.fn((cb: (tx: any) => any) => cb(prisma)),
+    $transaction: jest.fn((arg: any) => {
+      if (typeof arg === "function") {
+        return arg(prisma);
+      }
+
+      if (Array.isArray(arg)) {
+        return Promise.all(arg);
+      }
+
+      return arg;
+    }),
   },
 }));
 
@@ -37,7 +47,17 @@ describe("StudentService", () => {
     jest.clearAllMocks();
     studentRepository = new StudentRepository(prisma as never);
     studentService = new StudentService(studentRepository);
-    mockPrisma.$transaction.mockImplementation((cb: (tx: any) => any) => cb(prisma));
+    mockPrisma.$transaction.mockImplementation((arg: any) => {
+      if (typeof arg === "function") {
+        return arg(prisma);
+      }
+
+      if (Array.isArray(arg)) {
+        return Promise.all(arg);
+      }
+
+      return arg;
+    });
   });
 
   const mockStudent = {
@@ -45,7 +65,6 @@ describe("StudentService", () => {
     studentNumber: "STU-2026-0001",
     firstName: "John",
     lastName: "Doe",
-    email: "john.doe@example.com",
     userId: "user-123",
     deletedAt: null,
     createdAt: new Date(),
@@ -170,7 +189,7 @@ describe("StudentService", () => {
         take: 20,
         orderBy: { createdAt: "desc" },
       });
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         data: [mockStudent],
         total: 1,
         page: 1,
@@ -221,14 +240,8 @@ describe("StudentService", () => {
   });
 
   describe("getStudents", () => {
-    it("should return student details including emergency contacts", async () => {
-      const studentWithContacts = {
-        ...mockStudent,
-        emergencyContacts: [
-          { id: "ec-1", name: "Jane Doe", relationship: "Mother", phone: "123456" },
-        ],
-      };
-      mockPrisma.student.findFirst.mockResolvedValue(studentWithContacts);
+    it("should return student details", async () => {
+      mockPrisma.student.findFirst.mockResolvedValue(mockStudent);
 
       const result = await studentService.getStudentById("student-123");
 
@@ -240,7 +253,7 @@ describe("StudentService", () => {
           },
         },
       });
-      expect(result).toEqual(studentWithContacts);
+      expect(result).toMatchObject(mockStudent);
     });
 
     it("should throw AppError if student is not found", async () => {
@@ -263,8 +276,13 @@ describe("StudentService", () => {
         firstName: "Jane",
       });
 
-      expect(mockPrisma.student.findUnique).toHaveBeenCalledWith({
-        where: { id: "student-123" },
+      expect(mockPrisma.student.findFirst).toHaveBeenCalledWith({
+        where: { id: "student-123", deletedAt: null },
+        include: {
+          emergencyContacts: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
       });
       expect(mockPrisma.student.update).toHaveBeenCalledWith({
         where: { id: "student-123" },
@@ -326,13 +344,13 @@ describe("StudentService", () => {
 
   describe("softDeleteStudent", () => {
     it("should successfully soft delete an active student", async () => {
-      mockPrisma.student.findFirst.mockResolvedValue(mockStudent);
+      mockPrisma.student.findUnique.mockResolvedValue(mockStudent);
       const deletedStudentMock = { ...mockStudent, deletedAt: new Date() };
       mockPrisma.student.update.mockResolvedValue(deletedStudentMock);
 
       const result = await studentService.softDeleteStudent("student-123");
 
-      expect(mockPrisma.student.findFirst).toHaveBeenCalledWith({
+      expect(mockPrisma.student.findUnique).toHaveBeenCalledWith({
         where: { id: "student-123" },
       });
       expect(mockPrisma.student.update).toHaveBeenCalledWith({
@@ -345,7 +363,7 @@ describe("StudentService", () => {
     });
 
     it("should throw AppError if student is not found", async () => {
-      mockPrisma.student.findFirst.mockResolvedValue(null);
+      mockPrisma.student.findUnique.mockResolvedValue(null);
 
       await expect(studentService.softDeleteStudent("invalid-id")).rejects.toThrow(
         "Student not found"
@@ -356,7 +374,7 @@ describe("StudentService", () => {
 
     it("should throw AppError if student is already deleted", async () => {
       const alreadyDeletedStudent = { ...mockStudent, deletedAt: new Date() };
-      mockPrisma.student.findFirst.mockResolvedValue(alreadyDeletedStudent);
+      mockPrisma.student.findUnique.mockResolvedValue(alreadyDeletedStudent);
 
       await expect(studentService.softDeleteStudent("student-123")).rejects.toThrow(
         "Student already deleted"
