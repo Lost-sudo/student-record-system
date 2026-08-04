@@ -34,7 +34,7 @@ export class AcademicProgramService {
             const updated = await this.academicProgramRepository.update(id, input);
             return this.toDto(updated);
         } catch (error) {
-            throw new AppError("Academic program with this program code already exists", 409);
+            throw new AppError("Academic program with this program code cannot be updated", 409);
         }
     }
 
@@ -44,7 +44,7 @@ export class AcademicProgramService {
         try {
             await this.academicProgramRepository.delete(id);
         } catch (error) {
-            throw new AppError("Failed to delete this program code", 500);
+            throw new AppError("Failed to delete this program code", 409);
         }
     }
 
