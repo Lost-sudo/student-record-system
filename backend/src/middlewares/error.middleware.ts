@@ -1,13 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { logger } from "../config/logger";
-
-export class AppError extends Error {
-    statusCode: number;
-    constructor(message: string, statusCode: number) {
-        super(message);
-        this.statusCode = statusCode;
-    }
-}
+import { AppError } from "../utils/error.utils";
 
 export const errorHandler = (
     err: Error,
@@ -15,10 +8,11 @@ export const errorHandler = (
     res: Response,
     _next: NextFunction
 ) => {
-    const statusCode = (err as AppError).statusCode ?? 500;
-    const message = err.message || "Internal Server Error";
+    const isAppError = err instanceof AppError;
+    const statusCode = isAppError ? err.statusCode : 500;
+    const message = isAppError ? err.message : "Internal Server Error";
 
-    if (process.env.NODE_ENV === "development") {
+    if (!isAppError || process.env.NODE_ENV === "development") {
         logger.error(err);
     }
 
