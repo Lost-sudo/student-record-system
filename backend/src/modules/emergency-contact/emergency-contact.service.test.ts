@@ -1,7 +1,14 @@
 import { prisma } from "../../database/prisma";
-import { AppError } from "../../middlewares/error.middleware";
+import { NotFoundError } from "../../utils/error.utils";
 import { EmergencyContactRepository } from "./emergency-contact.repository";
 import { EmergencyContactService } from "./emergency-contact.service";
+
+jest.mock("../../utils/prisma-error.utils", () => ({
+  isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
+  isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
+  isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
+  isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
+}));
 
 jest.mock("../../database/prisma", () => ({
   prisma: {
@@ -43,17 +50,17 @@ describe("Emergency Contact Service", () => {
     service = new EmergencyContactService(new EmergencyContactRepository(prisma as never));
   });
 
-  it("throws when student does not exist", async () => {
+  it("throws NotFoundError when student does not exist", async () => {
     mockPrisma.student.findFirst.mockResolvedValue(null);
 
-    await expect(
-      service.createEmergencyContact("student-123", {
-        name: "Jane Doe",
-        relationship: "Mother",
-        phone: "1234567890",
-        isPrimary: false,
-      })
-    ).rejects.toThrow(AppError);
+    const promise = service.createEmergencyContact("student-123", {
+      name: "Jane Doe",
+      relationship: "Mother",
+      phone: "1234567890",
+      isPrimary: false,
+    });
+    await expect(promise).rejects.toThrow(NotFoundError);
+    await expect(promise).rejects.toThrow("Student not found");
   });
 
   it("creates a non-primary emergency contact", async () => {

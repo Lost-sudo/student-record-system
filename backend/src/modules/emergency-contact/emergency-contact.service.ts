@@ -1,4 +1,5 @@
-import { AppError } from "../../middlewares/error.middleware";
+import { AppError, InternalServerError, NotFoundError } from "../../utils/error.utils";
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound } from "../../utils/prisma-error.utils";
 import { CreateStudentEmergencyContact, UpdateStudentEmergencyContact } from "./emergency-contact.types";
 import { EmergencyContactRepository } from "./emergency-contact.repository";
 
@@ -9,30 +10,38 @@ export class EmergencyContactService {
     const student = await this.emergencyContactRepository.findStudentById(studentId);
 
     if (!student) {
-      throw new AppError("Student not found", 404);
+      throw new NotFoundError("Student not found");
     }
 
-    if (data.isPrimary) {
-      return this.emergencyContactRepository.transaction(async (tx) => {
-        await tx.emergencyContact.updateMany({
-          where: { studentId, isPrimary: true },
-          data: { isPrimary: false },
-        });
+    try {
+      if (data.isPrimary) {
+        return await this.emergencyContactRepository.transaction(async (tx) => {
+          await tx.emergencyContact.updateMany({
+            where: { studentId, isPrimary: true },
+            data: { isPrimary: false },
+          });
 
-        return tx.emergencyContact.create({
-          data: {
-            ...data,
-            studentId,
-            isPrimary: true,
-          },
+          return tx.emergencyContact.create({
+            data: {
+              ...data,
+              studentId,
+              isPrimary: true,
+            },
+          });
         });
+      }
+
+      return await this.emergencyContactRepository.create(studentId, {
+        ...data,
+        isPrimary: false,
       });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isForeignKeyConstraintViolation(error)) {
+        throw new NotFoundError("Student not found");
+      }
+      throw new InternalServerError("Failed to create emergency contact");
     }
-
-    return this.emergencyContactRepository.create(studentId, {
-      ...data,
-      isPrimary: false,
-    });
   }
 
   async getContactByStudentId(studentId: string) {
@@ -43,58 +52,74 @@ export class EmergencyContactService {
     const existingContact = await this.emergencyContactRepository.findById(contactId);
 
     if (!existingContact) {
-      throw new AppError("Student emergency contact not found", 404);
+      throw new NotFoundError("Student emergency contact not found");
     }
 
-    if (data.isPrimary) {
-      return this.emergencyContactRepository.transaction(async (tx) => {
-        await tx.emergencyContact.updateMany({
-          where: {
-            studentId: existingContact.studentId,
-            isPrimary: true,
-            id: { not: contactId },
-          },
-          data: {
-            isPrimary: false,
-          },
-        });
+    try {
+      if (data.isPrimary) {
+        return await this.emergencyContactRepository.transaction(async (tx) => {
+          await tx.emergencyContact.updateMany({
+            where: {
+              studentId: existingContact.studentId,
+              isPrimary: true,
+              id: { not: contactId },
+            },
+            data: {
+              isPrimary: false,
+            },
+          });
 
-        return tx.emergencyContact.update({
-          where: { id: contactId },
-          data,
+          return tx.emergencyContact.update({
+            where: { id: contactId },
+            data,
+          });
         });
-      });
+      }
+
+      return await this.emergencyContactRepository.update(contactId, data);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isPrismaRecordNotFound(error)) {
+        throw new NotFoundError("Student emergency contact not found");
+      }
+      throw new InternalServerError("Failed to update emergency contact");
     }
-
-    return this.emergencyContactRepository.update(contactId, data);
   }
 
   async deleteEmergencyContact(contactId: string) {
     const existingContact = await this.emergencyContactRepository.findById(contactId);
 
     if (!existingContact) {
-      throw new AppError("Student emergency contact not found", 404);
+      throw new NotFoundError("Student emergency contact not found");
     }
 
     const wasPrimary = existingContact.isPrimary;
     const studentId = existingContact.studentId;
 
-    return this.emergencyContactRepository.transaction(async (tx) => {
-      await tx.emergencyContact.delete({ where: { id: contactId } });
+    try {
+      return await this.emergencyContactRepository.transaction(async (tx) => {
+        await tx.emergencyContact.delete({ where: { id: contactId } });
 
-      if (wasPrimary) {
-        const oldestContact = await tx.emergencyContact.findFirst({
-          where: { studentId },
-          orderBy: { createdAt: "asc" },
-        });
-
-        if (oldestContact) {
-          await tx.emergencyContact.update({
-            where: { id: oldestContact.id },
-            data: { isPrimary: true },
+        if (wasPrimary) {
+          const oldestContact = await tx.emergencyContact.findFirst({
+            where: { studentId },
+            orderBy: { createdAt: "asc" },
           });
+
+          if (oldestContact) {
+            await tx.emergencyContact.update({
+              where: { id: oldestContact.id },
+              data: { isPrimary: true },
+            });
+          }
         }
+      });
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isPrismaRecordNotFound(error)) {
+        throw new NotFoundError("Student emergency contact not found");
       }
-    });
+      throw new InternalServerError("Failed to delete emergency contact");
+    }
   }
 }
