@@ -1,5 +1,6 @@
 import { Course } from "../../../generated/prisma/client";
-import { AppError } from "../../../middlewares/error.middleware";
+import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils";
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../../utils/prisma-error.utils";
 import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination";
 import { CourseRepository } from "./course.repository";
 import { CourseDto, CourseQueryInput, CreateCourseInput, UpdateCourseInput } from "./course.types";
@@ -12,7 +13,7 @@ export class CourseService {
             const course = await this.courseRepository.create(input);
             
             if (!course) {
-                throw new AppError("A course with this course already exist", 409);
+                throw new ConflictError("A course with this course already exist");
             }
             
             return this.toDto(course);
@@ -20,7 +21,10 @@ export class CourseService {
             if (error instanceof AppError) {
                 throw error;
             }
-            throw new AppError("There is an error creating a course", 500);
+            if (isUniqueConstraintViolation(error)) {
+                throw new ConflictError("A course with this course already exist");
+            }
+            throw new InternalServerError("There is an error creating a course");
         }
     };
 
@@ -28,7 +32,7 @@ export class CourseService {
         const course = await this.courseRepository.findById(id);
 
         if (!course) {
-            throw new AppError("Course not found", 404);
+            throw new NotFoundError("Course not found");
         }
 
         return this.toDto(course);
@@ -41,7 +45,7 @@ export class CourseService {
             const updated = await this.courseRepository.update(id, input);
 
             if (!updated) {
-                throw new AppError("Failed to update course ", 400);
+                throw new BadRequestError("Failed to update course ");
             }
 
             return this.toDto(updated);
@@ -49,8 +53,14 @@ export class CourseService {
             if (error instanceof AppError) {
                 throw error;
             }
+            if (isUniqueConstraintViolation(error)) {
+                throw new ConflictError("A course with this course already exist");
+            }
+            if (isPrismaRecordNotFound(error)) {
+                throw new NotFoundError("Course not found");
+            }
 
-            throw new AppError("There is an error updating the course", 500)
+            throw new InternalServerError("There is an error updating the course")
         }
     }
 
@@ -60,7 +70,16 @@ export class CourseService {
         try {
             await this.courseRepository.delete(id);
         } catch (error) {
-            throw new AppError("Failed to delete course", 500);
+            if (error instanceof AppError) {
+                throw error;
+            }
+            if (isForeignKeyConstraintViolation(error)) {
+                throw new ConflictError("Failed to delete course");
+            }
+            if (isPrismaRecordNotFound(error)) {
+                throw new NotFoundError("Course not found");
+            }
+            throw new InternalServerError("Failed to delete course");
         }
     };
 

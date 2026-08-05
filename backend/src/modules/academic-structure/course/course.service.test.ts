@@ -1,8 +1,14 @@
-import { mock } from "node:test";
-import { AppError } from "../../../middlewares/error.middleware";
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils";
 import { CourseRepository } from "./course.repository";
 import { CourseService } from "./course.service";
 import { CreateCourseInput, UpdateCourseInput } from "./course.types";
+
+jest.mock("../../../utils/prisma-error.utils", () => ({
+  isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
+  isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
+  isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
+  isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
+}));
 
 const mockCourseRepository = {
     create: jest.fn(),
@@ -64,32 +70,28 @@ describe('CourseService', () => {
             });
         });
 
-        it('should throw a 409 Conflict error if repository returns null/undefined', async () => {
+        it('should throw ConflictError if repository returns null/undefined', async () => {
             mockCourseRepository.create.mockResolvedValue(null);
 
-            await expect(service.create(createInput)).rejects.toThrow(AppError);
-
-            try {
-                await service.create(createInput);
-            } catch (error: any) {
-                expect(error).toBeInstanceOf(AppError);
-                expect(error.message).toBe('A course with this course already exist');
-                expect(error.statusCode).toBe(409);
-            }
+            const promise = service.create(createInput);
+            await expect(promise).rejects.toThrow(ConflictError);
+            await expect(promise).rejects.toThrow('A course with this course already exist');
         });
 
-        it('should throw a generic 500 AppError if the repository throws a database error', async () => {
-            mockCourseRepository.create.mockRejectedValue(AppError);
+        it('should throw ConflictError if a unique constraint violation occurs', async () => {
+            mockCourseRepository.create.mockRejectedValue({ code: 'P2002' });
 
-            await expect(service.create).rejects.toThrow(AppError);
+            const promise = service.create(createInput);
+            await expect(promise).rejects.toThrow(ConflictError);
+            await expect(promise).rejects.toThrow('A course with this course already exist');
+        });
 
-            try {
-                await service.create(createInput);
-            } catch (error: any) {
-                expect(error).toBeInstanceOf(AppError);
-                expect(error.message).toBe('There is an error creating a course');
-                expect(error.statusCode).toBe(500);
-            }
+        it('should throw InternalServerError if the repository throws a database error', async () => {
+            mockCourseRepository.create.mockRejectedValue(new Error('Database connection lost'));
+
+            const promise = service.create(createInput);
+            await expect(promise).rejects.toThrow(InternalServerError);
+            await expect(promise).rejects.toThrow('There is an error creating a course');
         });
     });
 
@@ -104,18 +106,12 @@ describe('CourseService', () => {
             expect(result.courseCode).toBe('CS101');
         });
 
-        it('should throw 404 Not Found error if course does not exist', async () => {
+        it('should throw NotFoundError if course does not exist', async () => {
             mockCourseRepository.findById.mockResolvedValue(null);
 
-            await expect(service.getById('non-existent-id')).rejects.toThrow(AppError);
-
-            try {
-                await service.getById('non-existent-id');
-            } catch (error: any) {
-                expect(error).toBeInstanceOf(AppError);
-                expect(error.message).toBe('Course not found');
-                expect(error.statusCode).toBe(404);
-            }
+            const promise = service.getById('non-existent-id');
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Course not found');
         });
     });
 
@@ -133,45 +129,39 @@ describe('CourseService', () => {
             expect(result.title).toBe('Updated CS101 Title')
         });
 
-        it('should throw 404 Not Found error if course to update does not exist', async () => {
+        it('should throw NotFoundError if course to update does not exist', async () => {
             mockCourseRepository.findById.mockResolvedValue(null);
 
-            await expect(service.update('non-existent-id', updateInput)).rejects.toThrow(AppError);
-
-            try {
-                await service.update('non-existent-id', updateInput);
-            } catch (error: any) {
-                expect(error.statusCode).toBe(404);
-                expect(error.message).toBe('Course not found')
-            }
+            const promise = service.update('non-existent-id', updateInput);
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Course not found');
         });
 
-        it('should throw 404 Bad Request error if repository return null/undefined on update', async () => {
+        it('should throw BadRequestError if repository returns null/undefined on update', async () => {
             mockCourseRepository.findById.mockResolvedValue(mockCourse);
             mockCourseRepository.update.mockResolvedValue(null);
 
-            await expect(service.update(mockCourse.id, updateInput)).rejects.toThrow(AppError);
-
-            try {
-                await service.update(mockCourse.id, updateInput);
-            } catch (error: any) {
-                expect(error.statusCode).toBe(400);
-                expect(error.message).toBe('Failed to update course ');
-            }
+            const promise = service.update(mockCourse.id, updateInput);
+            await expect(promise).rejects.toThrow(BadRequestError);
+            await expect(promise).rejects.toThrow('Failed to update course ');
         });
 
-        it('should throw generic 500 AppError if the repository  throws a database error on update', async () => {
+        it('should throw NotFoundError if the course is removed concurrently (P2025)', async () => {
             mockCourseRepository.findById.mockResolvedValue(mockCourse);
-            mockCourseRepository.update.mockRejectedValue(AppError);
+            mockCourseRepository.update.mockRejectedValue({ code: 'P2025' });
 
-            await expect(service.update(mockCourse.id, updateInput)).rejects.toThrow(AppError);
+            const promise = service.update(mockCourse.id, updateInput);
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Course not found');
+        });
 
-            try {
-                await service.update(mockCourse.id, updateInput);
-            } catch (error: any) {
-                expect(error.statusCode).toBe(500);
-                expect(error.message).toBe('There is an error updating the course')
-            }
+        it('should throw InternalServerError if the repository throws a database error on update', async () => {
+            mockCourseRepository.findById.mockResolvedValue(mockCourse);
+            mockCourseRepository.update.mockRejectedValue(new Error('Database connection lost'));
+
+            const promise = service.update(mockCourse.id, updateInput);
+            await expect(promise).rejects.toThrow(InternalServerError);
+            await expect(promise).rejects.toThrow('There is an error updating the course')
         });
     });
 
@@ -186,24 +176,30 @@ describe('CourseService', () => {
             expect(mockCourseRepository.delete).toHaveBeenCalledWith(mockCourse.id);
         });
 
-        it('should throw 404 AppError if the course to delete does not exist', async () => {
+        it('should throw NotFoundError if the course to delete does not exist', async () => {
             mockCourseRepository.findById.mockResolvedValue(null);
 
-            await expect(service.delete('non-existent-id')).rejects.toThrow(AppError);
+            const promise = service.delete('non-existent-id');
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Course not found');
         });
 
-        it('should throw a generic 500 AppError if the repository throws an error', async () => {
+        it('should throw ConflictError if the course is referenced elsewhere (P2003)', async () => {
             mockCourseRepository.findById.mockResolvedValue(mockCourse);
-            mockCourseRepository.delete.mockRejectedValue(AppError);
+            mockCourseRepository.delete.mockRejectedValue({ code: 'P2003' });
 
-            await expect(service.delete(mockCourse.id)).rejects.toThrow(AppError);
+            const promise = service.delete(mockCourse.id);
+            await expect(promise).rejects.toThrow(ConflictError);
+            await expect(promise).rejects.toThrow('Failed to delete course');
+        });
 
-            try {
-                await service.delete(mockCourse.id);
-            } catch (error: any) {
-                expect(error.statusCode).toBe(500);
-                expect(error.message).toBe('Failed to delete course');
-            }
+        it('should throw InternalServerError if the repository throws an error', async () => {
+            mockCourseRepository.findById.mockResolvedValue(mockCourse);
+            mockCourseRepository.delete.mockRejectedValue(new Error('Database connection lost'));
+
+            const promise = service.delete(mockCourse.id);
+            await expect(promise).rejects.toThrow(InternalServerError);
+            await expect(promise).rejects.toThrow('Failed to delete course');
         });
     });
 
