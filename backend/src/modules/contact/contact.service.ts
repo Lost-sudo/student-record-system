@@ -1,4 +1,5 @@
-import { AppError } from "../../middlewares/error.middleware";
+import { AppError, ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils";
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils";
 import { ContactRepository } from "./contact.repository";
 import { CreateContactInfo, UpdateContactInfo } from "./contact.types";
 
@@ -9,16 +10,27 @@ export class ContactService {
     const student = await this.contactRepository.findStudentById(studentId);
 
     if (!student) {
-      throw new AppError("Student not found", 404);
+      throw new NotFoundError("Student not found");
     }
 
     const existingContactInfo = await this.contactRepository.findByStudentId(studentId);
 
     if (existingContactInfo) {
-      throw new AppError("Contact info already exist for this student. Use update instead", 409);
+      throw new ConflictError("Contact info already exist for this student. Use update instead");
     }
 
-    return this.contactRepository.create(studentId, data);
+    try {
+      return await this.contactRepository.create(studentId, data);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isUniqueConstraintViolation(error)) {
+        throw new ConflictError("Contact info already exist for this student. Use update instead");
+      }
+      if (isForeignKeyConstraintViolation(error)) {
+        throw new NotFoundError("Student not found");
+      }
+      throw new InternalServerError("Failed to create contact info");
+    }
   }
 
   async getContactInfoByStudentId(studentId: string) {
@@ -29,19 +41,35 @@ export class ContactService {
     const existingContactInfo = await this.contactRepository.findByStudentId(studentId);
 
     if (!existingContactInfo) {
-      throw new AppError("Contact not found", 404);
+      throw new NotFoundError("Contact not found");
     }
 
-    return this.contactRepository.updateByStudentId(studentId, data);
+    try {
+      return await this.contactRepository.updateByStudentId(studentId, data);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isPrismaRecordNotFound(error)) {
+        throw new NotFoundError("Contact not found");
+      }
+      throw new InternalServerError("Failed to update contact info");
+    }
   }
 
   async deleteContactInfo(id: string) {
     const existingContactInfo = await this.contactRepository.findById(id);
 
     if (!existingContactInfo) {
-      throw new AppError("Contact not found", 404);
+      throw new NotFoundError("Contact not found");
     }
 
-    return this.contactRepository.deleteById(id);
+    try {
+      return await this.contactRepository.deleteById(id);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isPrismaRecordNotFound(error)) {
+        throw new NotFoundError("Contact not found");
+      }
+      throw new InternalServerError("Failed to delete contact info");
+    }
   }
 }

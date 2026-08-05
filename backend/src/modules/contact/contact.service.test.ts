@@ -1,7 +1,14 @@
 import { prisma } from "../../database/prisma";
-import { AppError } from "../../middlewares/error.middleware";
+import { ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils";
 import { ContactRepository } from "./contact.repository";
 import { ContactService } from "./contact.service";
+
+jest.mock("../../utils/prisma-error.utils", () => ({
+  isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
+  isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
+  isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
+  isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
+}));
 
 jest.mock("../../database/prisma", () => ({
   prisma: {
@@ -67,13 +74,31 @@ describe("Contact Information Service", () => {
     });
   });
 
-  it("throws if contact info already exists", async () => {
+  it("throws ConflictError if contact info already exists", async () => {
     mockPrisma.student.findFirst.mockResolvedValue({ id: "student-123" });
     mockPrisma.contactInfo.findUnique.mockResolvedValue({ id: "ci-1" });
 
-    await expect(
-      service.createContactInfo("student-123", { email: "test@test.com" })
-    ).rejects.toThrow("Contact info already exist for this student. Use update instead");
+    const promise = service.createContactInfo("student-123", { email: "test@test.com" });
+    await expect(promise).rejects.toThrow(ConflictError);
+    await expect(promise).rejects.toThrow("Contact info already exist for this student. Use update instead");
+  });
+
+  it("throws NotFoundError if student does not exist", async () => {
+    mockPrisma.student.findFirst.mockResolvedValue(null);
+
+    const promise = service.createContactInfo("student-123", { email: "test@test.com" });
+    await expect(promise).rejects.toThrow(NotFoundError);
+    await expect(promise).rejects.toThrow("Student not found");
+  });
+
+  it("throws InternalServerError if create fails unexpectedly", async () => {
+    mockPrisma.student.findFirst.mockResolvedValue({ id: "student-123" });
+    mockPrisma.contactInfo.findUnique.mockResolvedValue(null);
+    mockPrisma.contactInfo.create.mockRejectedValue(new Error("Database connection lost"));
+
+    const promise = service.createContactInfo("student-123", { email: "test@test.com" });
+    await expect(promise).rejects.toThrow(InternalServerError);
+    await expect(promise).rejects.toThrow("Failed to create contact info");
   });
 
   it("updates existing contact info by student id", async () => {
@@ -92,6 +117,26 @@ describe("Contact Information Service", () => {
     ).resolves.toMatchObject({ phone: "1234567890" });
   });
 
+  it("throws NotFoundError if contact does not exist", async () => {
+    mockPrisma.contactInfo.findUnique.mockResolvedValue(null);
+
+    const promise = service.updateContactInfo("student-123", { phone: "1234567890" });
+    await expect(promise).rejects.toThrow(NotFoundError);
+    await expect(promise).rejects.toThrow("Contact not found");
+  });
+
+  it("throws InternalServerError if update fails unexpectedly", async () => {
+    mockPrisma.contactInfo.findUnique.mockResolvedValue({
+      id: "ci-1",
+      studentId: "student-123",
+    });
+    mockPrisma.contactInfo.update.mockRejectedValue(new Error("Database connection lost"));
+
+    const promise = service.updateContactInfo("student-123", { phone: "1234567890" });
+    await expect(promise).rejects.toThrow(InternalServerError);
+    await expect(promise).rejects.toThrow("Failed to update contact info");
+  });
+
   it("deletes contact info by id", async () => {
     mockPrisma.contactInfo.findUnique.mockResolvedValue({
       id: "ci-1",
@@ -105,5 +150,25 @@ describe("Contact Information Service", () => {
     await expect(service.deleteContactInfo("ci-1")).resolves.toMatchObject({
       id: "ci-1",
     });
+  });
+
+  it("throws NotFoundError if contact does not exist", async () => {
+    mockPrisma.contactInfo.findUnique.mockResolvedValue(null);
+
+    const promise = service.deleteContactInfo("ci-1");
+    await expect(promise).rejects.toThrow(NotFoundError);
+    await expect(promise).rejects.toThrow("Contact not found");
+  });
+
+  it("throws InternalServerError if delete fails unexpectedly", async () => {
+    mockPrisma.contactInfo.findUnique.mockResolvedValue({
+      id: "ci-1",
+      studentId: "student-123",
+    });
+    mockPrisma.contactInfo.delete.mockRejectedValue(new Error("Database connection lost"));
+
+    const promise = service.deleteContactInfo("ci-1");
+    await expect(promise).rejects.toThrow(InternalServerError);
+    await expect(promise).rejects.toThrow("Failed to delete contact info");
   });
 });
