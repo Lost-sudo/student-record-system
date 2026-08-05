@@ -1,5 +1,6 @@
 import { AcademicTerm } from '../../../generated/prisma/client';
-import { AppError } from '../../../middlewares/error.middleware';
+import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils';
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from '../../../utils/prisma-error.utils';
 import { PaginationMeta, buildPaginationMeta } from '../../../utils/pagination';
 import { AcademicTermRepository } from "./academic-term.repository"
 import { AcademicTermDto, AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types";
@@ -12,7 +13,11 @@ export class AcademicTermService {
             const term = await this.academicTermRepository.create(input);
             return this.toDto(term);
         } catch (error) {
-            throw new AppError("A term with this term code already exist", 409);
+            if (error instanceof AppError) throw error;
+            if (isUniqueConstraintViolation(error)) {
+                throw new ConflictError("A term with this term code already exist");
+            }
+            throw new InternalServerError("Failed to create academic term");
         }
     }
 
@@ -20,7 +25,7 @@ export class AcademicTermService {
         const term = await this.academicTermRepository.findById(id);
 
         if (!term) {
-            throw new AppError('Academic term not found', 404);
+            throw new NotFoundError('Academic term not found');
         }
 
         return this.toDto(term);
@@ -33,14 +38,21 @@ export class AcademicTermService {
         const mergedEndDate = input.endDate ?? (await existing).endDate;
 
         if (mergedEndDate <= mergedStartDate) {
-            throw new AppError("End date must be after start date", 400);
+            throw new BadRequestError("End date must be after start date");
         }
 
         try {
             const updated = await this.academicTermRepository.update(id, input);
             return this.toDto(updated);
         } catch (error) {
-            throw new AppError("Failed to update academic term", 500);
+            if (error instanceof AppError) throw error;
+            if (isUniqueConstraintViolation(error)) {
+                throw new ConflictError("A term with this term code already exist");
+            }
+            if (isPrismaRecordNotFound(error)) {
+                throw new NotFoundError('Academic term not found');
+            }
+            throw new InternalServerError("Failed to update academic term");
         }
     }
 
@@ -50,7 +62,14 @@ export class AcademicTermService {
         try {
             await this.academicTermRepository.delete(id);
         } catch (error) {
-            throw new AppError('Failed to delete academic term', 400);
+            if (error instanceof AppError) throw error;
+            if (isForeignKeyConstraintViolation(error)) {
+                throw new ConflictError('Failed to delete academic term');
+            }
+            if (isPrismaRecordNotFound(error)) {
+                throw new NotFoundError('Academic term not found');
+            }
+            throw new InternalServerError('Failed to delete academic term');
         }
     }
 
