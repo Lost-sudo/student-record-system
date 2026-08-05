@@ -1,0 +1,18 @@
+model StudentProgram {
+  id               String               @id @default(uuid())
+  studentId        String
+  student          Student              @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  
+  curriculumId     String
+  curriculum       CurriculumVersion    @relation(fields: [curriculumId], references: [id], onDelete: Restrict)
+  
+  enrollmentDate   DateTime             @default(now())
+  status           StudentProgramStatus @default(ACTIVE)
+  expectedGradDate DateTime?
+
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  @@index([studentId, status])
+  @@index([curriculumId])
+}

@@ -1,5 +1,7 @@
 import { Prisma } from "../../generated/prisma/client";
+import { CreateContactInformationInput, UpdateContactInformationInput } from "./contact.validator";
 
-export type CreateContactInfo = Omit<Prisma.ContactInfoCreateInput, "student">;
+export type ContactInfoDto = Prisma.ContactInfoGetPayload<{}>;
 
-export type UpdateContactInfo = Prisma.ContactInfoUpdateInput;
+export type CreateContactInfo = CreateContactInformationInput;
+export type UpdateContactInfo = UpdateContactInformationInput;

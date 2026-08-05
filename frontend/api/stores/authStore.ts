@@ -26,10 +26,49 @@ export const getAccessToken = (): string | null => {
     return null;
 };
 
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+
+const scheduleProactiveRefresh = (token: string) => {
+    const payload = decodeJwt(token);
+    if (payload?.exp) {
+        const delay = payload.exp * 1000 - Date.now() - 60_000;
+        if (delay > 0) {
+            refreshTimer = setTimeout(() => {
+                apiClient.post('/auth/refresh')
+                    .then(({ data }) => {
+                        setAccessToken(data.accessToken);
+                    })
+                    .catch(() => {
+                        setAccessToken(null);
+                        window.location.href = "/login";
+                    });
+            }, delay);
+        }
+    }
+};
+
+const decodeJwt = (token: string): { exp?: number } | null => {
+    try {
+        const payload = token.split('.')[1];
+        if (!payload) return null;
+        const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+        const decoded = atob(base64);
+        return JSON.parse(decoded);
+    } catch {
+        return null;
+    }
+};
+
 export const setAccessToken = (token: string | null) => {
+    if (refreshTimer) {
+        clearTimeout(refreshTimer);
+        refreshTimer = null;
+    }
+
     if (token) {
         queryClient.setQueryData(AUTH_KEYS.token, token);
         window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+        scheduleProactiveRefresh(token);
     } else {
         queryClient.removeQueries({ queryKey: AUTH_KEYS.token });
         window.localStorage.removeItem(TOKEN_STORAGE_KEY);
