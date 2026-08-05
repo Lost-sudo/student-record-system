@@ -1,5 +1,6 @@
 import { Student } from "../../generated/prisma/client";
-import { AppError } from "../../middlewares/error.middleware";
+import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils";
+import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils";
 import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination";
 import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator";
 import { StudentDto } from "./student.types";
@@ -23,11 +24,20 @@ export class StudentService {
     if (userId) {
       const existingUserLink = await this.studentRepository.findLinkedStudentByUserId(userId);
       if (existingUserLink) {
-        throw new AppError("This user account is already linked to another student", 409);
+        throw new ConflictError("This user account is already linked to another student");
       }
     }
 
-    const newStudent = await this.studentRepository.createWithGeneratedNumber(input, userId);
+    let newStudent: Student;
+    try {
+      newStudent = await this.studentRepository.createWithGeneratedNumber(input, userId);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isUniqueConstraintViolation(error)) {
+        throw new ConflictError("This user account is already linked to another student");
+      }
+      throw new InternalServerError("Failed to create student");
+    }
     return this.toDto(newStudent);
   }
 
@@ -60,7 +70,7 @@ export class StudentService {
     const student = await this.studentRepository.findById(studentId);
 
     if (!student) {
-      throw new AppError("Student not found", 404);
+      throw new NotFoundError("Student not found");
     }
 
     return this.toDto(student);
@@ -76,18 +86,30 @@ export class StudentService {
     if (input.studentNumber) {
       const duplicateStudentNumber = await this.studentRepository.findDuplicateStudentNumber(input.studentNumber, studentId);
       if (duplicateStudentNumber) {
-        throw new AppError("Student number is already taken by another student", 409);
+        throw new ConflictError("Student number is already taken by another student");
       }
     }
 
     if (input.userId) {
       const duplicateUserId = await this.studentRepository.findDuplicateUserId(input.userId, studentId);
       if (duplicateUserId) {
-        throw new AppError("This user account is already linked to another student", 409);
+        throw new ConflictError("This user account is already linked to another student");
       }
     }
 
-    const updated = await this.studentRepository.update(studentId, input);
+    let updated: Student;
+    try {
+      updated = await this.studentRepository.update(studentId, input);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isUniqueConstraintViolation(error)) {
+        throw new ConflictError("Student number is already taken by another student");
+      }
+      if (isPrismaRecordNotFound(error)) {
+        throw new NotFoundError("Student not found");
+      }
+      throw new InternalServerError("Failed to update student");
+    }
     return this.toDto(updated);
   }
 
@@ -99,14 +121,23 @@ export class StudentService {
     const existingStudent = await this.studentRepository.findExistingById(studentId);
 
     if (!existingStudent) {
-      throw new AppError("Student not found", 404);
+      throw new NotFoundError("Student not found");
     }
 
     if (existingStudent.deletedAt !== null) {
-      throw new AppError("Student already deleted", 400);
+      throw new BadRequestError("Student already deleted");
     }
 
-    const deleted = await this.studentRepository.delete(studentId);
+    let deleted: Student;
+    try {
+      deleted = await this.studentRepository.delete(studentId);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isPrismaRecordNotFound(error)) {
+        throw new NotFoundError("Student not found");
+      }
+      throw new InternalServerError("Failed to delete student");
+    }
     return this.toDto(deleted);
   }
 

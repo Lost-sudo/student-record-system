@@ -1,7 +1,14 @@
 import { StudentService } from "./student.service";
 import { StudentRepository } from "./student.repository";
 import { prisma } from "../../database/prisma";
-import { AppError } from "../../middlewares/error.middleware";
+import { BadRequestError, ConflictError, NotFoundError } from "../../utils/error.utils";
+
+jest.mock("../../utils/prisma-error.utils", () => ({
+  isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
+  isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
+  isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
+  isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
+}));
 
 jest.mock("../../database/prisma", () => ({
   prisma: {
@@ -158,16 +165,12 @@ describe("StudentService", () => {
       expect(result.userId).toBe("user-123");
     });
 
-    it("should throw AppError if user account is already linked to another student", async () => {
+    it("should throw ConflictError if user account is already linked to another student", async () => {
       mockPrisma.student.findFirst.mockResolvedValueOnce(mockStudent);
 
-      await expect(
-        studentService.createStudent(studentInput, "user-123")
-      ).rejects.toThrow(AppError);
-
-      await expect(
-        studentService.createStudent(studentInput, "user-123")
-      ).rejects.toThrow("This user account is already linked to another student");
+      const createPromise = studentService.createStudent(studentInput, "user-123");
+      await expect(createPromise).rejects.toThrow(ConflictError);
+      await expect(createPromise).rejects.toThrow("This user account is already linked to another student");
 
       expect(mockPrisma.student.create).not.toHaveBeenCalled();
     });
@@ -256,13 +259,12 @@ describe("StudentService", () => {
       expect(result).toMatchObject(mockStudent);
     });
 
-    it("should throw AppError if student is not found", async () => {
+    it("should throw NotFoundError if student is not found", async () => {
       mockPrisma.student.findFirst.mockResolvedValue(null);
 
-      await expect(studentService.getStudentById("invalid-id")).rejects.toThrow(AppError);
-      await expect(studentService.getStudentById("invalid-id")).rejects.toThrow(
-        "Student not found"
-      );
+      const promise = studentService.getStudentById("invalid-id");
+      await expect(promise).rejects.toThrow(NotFoundError);
+      await expect(promise).rejects.toThrow("Student not found");
     });
   });
 
@@ -291,25 +293,25 @@ describe("StudentService", () => {
       expect(result.firstName).toBe("Jane");
     });
 
-    it("should throw AppError if target student to update is not found", async () => {
+    it("should throw NotFoundError if target student to update is not found", async () => {
       mockPrisma.student.findFirst.mockResolvedValue(null);
 
-      await expect(
-        studentService.updateStudent("non-existent-id", { firstName: "Jane" })
-      ).rejects.toThrow("Student not found");
+      const promise = studentService.updateStudent("non-existent-id", { firstName: "Jane" });
+      await expect(promise).rejects.toThrow(NotFoundError);
+      await expect(promise).rejects.toThrow("Student not found");
 
       expect(mockPrisma.student.update).not.toHaveBeenCalled();
     });
 
-    it("should throw AppError if updated studentNumber is already taken by another student", async () => {
+    it("should throw ConflictError if updated studentNumber is already taken by another student", async () => {
       mockPrisma.student.findFirst.mockResolvedValueOnce(mockStudent);
       mockPrisma.student.findFirst.mockResolvedValue({ id: "student-456" });
 
-      await expect(
-        studentService.updateStudent("student-123", {
-          studentNumber: "STU-2026-9999",
-        })
-      ).rejects.toThrow("Student number is already taken by another student");
+      const promise = studentService.updateStudent("student-123", {
+        studentNumber: "STU-2026-9999",
+      });
+      await expect(promise).rejects.toThrow(ConflictError);
+      await expect(promise).rejects.toThrow("Student number is already taken by another student");
 
       expect(mockPrisma.student.findFirst).toHaveBeenCalledWith({
         where: {
@@ -321,15 +323,15 @@ describe("StudentService", () => {
       expect(mockPrisma.student.update).not.toHaveBeenCalled();
     });
 
-    it("should throw AppError if updated userId is already linked to another student", async () => {
+    it("should throw ConflictError if updated userId is already linked to another student", async () => {
       mockPrisma.student.findFirst.mockResolvedValueOnce(mockStudent);
       mockPrisma.student.findFirst.mockResolvedValue({ id: "student-456" });
 
-      await expect(
-        studentService.updateStudent("student-123", {
-          userId: "user-456",
-        })
-      ).rejects.toThrow("This user account is already linked to another student");
+      const promise = studentService.updateStudent("student-123", {
+        userId: "user-456",
+      });
+      await expect(promise).rejects.toThrow(ConflictError);
+      await expect(promise).rejects.toThrow("This user account is already linked to another student");
 
       expect(mockPrisma.student.findFirst).toHaveBeenCalledWith({
         where: {
@@ -362,23 +364,23 @@ describe("StudentService", () => {
       expect(result.deletedAt).not.toBeNull();
     });
 
-    it("should throw AppError if student is not found", async () => {
+    it("should throw NotFoundError if student is not found", async () => {
       mockPrisma.student.findUnique.mockResolvedValue(null);
 
-      await expect(studentService.softDeleteStudent("invalid-id")).rejects.toThrow(
-        "Student not found"
-      );
+      const promise = studentService.softDeleteStudent("invalid-id");
+      await expect(promise).rejects.toThrow(NotFoundError);
+      await expect(promise).rejects.toThrow("Student not found");
 
       expect(mockPrisma.student.update).not.toHaveBeenCalled();
     });
 
-    it("should throw AppError if student is already deleted", async () => {
+    it("should throw BadRequestError if student is already deleted", async () => {
       const alreadyDeletedStudent = { ...mockStudent, deletedAt: new Date() };
       mockPrisma.student.findUnique.mockResolvedValue(alreadyDeletedStudent);
 
-      await expect(studentService.softDeleteStudent("student-123")).rejects.toThrow(
-        "Student already deleted"
-      );
+      const promise = studentService.softDeleteStudent("student-123");
+      await expect(promise).rejects.toThrow(BadRequestError);
+      await expect(promise).rejects.toThrow("Student already deleted");
 
       expect(mockPrisma.student.update).not.toHaveBeenCalled();
     });
