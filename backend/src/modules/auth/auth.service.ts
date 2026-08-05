@@ -1,120 +1,129 @@
 import { prisma } from "../../database/prisma";
 import { hashPassword, comparePassword } from "../../utils/password.utils";
 import { generateTokenPair, verifyRefreshToken } from "../../utils/jwt.utils";
-import { AppError } from "../../middlewares/error.middleware";
+import { AppError, ConflictError, UnauthorizedError, ForbiddenError, NotFoundError, InternalServerError } from "../../utils/error.utils";
+import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils";
 import { UserRole } from "../../generated/prisma/enums";
+import { AuthRepository } from "./auth.repository";
 
 export class AuthService {
-    async register(email: string, username: string, password: string, role: UserRole) {
-        const existingUser = await prisma.user.findFirst({
-            where: {
-                OR: [
-                    {email},
-                    {username},
-                ]
-            }
-        });
+  constructor(private readonly authRepository: AuthRepository) {}
 
-        if (existingUser) {
-            throw new AppError("Email or username already in use", 409);
-        }
+  async register(email: string, username: string, password: string, role: UserRole) {
+    const existingUser = await this.authRepository.findUserByEmailOrUsername(email, username);
 
-        const passwordHash = await hashPassword(password);
-        
-        const user = await prisma.user.create({
-            data: {email, username, passwordHash, role},
-        });
-
-        const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
-
-        return {user: await this._sanitizeUser(user), ...tokens};
+    if (existingUser) {
+      throw new ConflictError("Email or username already in use");
     }
 
-    async login(email: string, password: string) {
-        const user = await prisma.user.findUnique({
-            where: {email}
-        });
+    const passwordHash = await hashPassword(password);
 
-        if (!user || (!await comparePassword(password, user.passwordHash))) {
-            throw new AppError("Invalid email or password", 401);
-        }
-
-        if (!user.isActive) {
-            throw new AppError("Account is deactivated", 403);
-        }
-
-        await prisma.user.update({
-            where: {id : user.id},
-            data: { lastLoginAt: new Date() }
-        });
-
-        const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
-        return { user: await this._sanitizeUser(user), ...tokens };
+    let user;
+    try {
+      user = await this.authRepository.createUser(email, username, passwordHash, role);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isUniqueConstraintViolation(error)) {
+        throw new ConflictError("Email or username already in use");
+      }
+      throw new InternalServerError("Failed to register user");
     }
 
-    async refreshTokens(oldRefreshToken: string) {
-        let payload;
+    const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
 
-        try {
-            payload = verifyRefreshToken(oldRefreshToken);
-        } catch {
-            throw new AppError("Invalid or expired refresh token", 401);
-        }
+    return { user: await this._sanitizeUser(user), ...tokens };
+  }
 
-        const storedToken = await prisma.refreshToken.findUnique({
-            where: { token: oldRefreshToken },
-        });
+  async login(email: string, password: string) {
+    const user = await this.authRepository.findUserByEmail(email);
 
-        if (!storedToken || storedToken.expiresAt < new Date()) {
-            if (storedToken) {
-                await prisma.refreshToken.deleteMany({ where: {userId: payload.sub} })
-            }
-            throw new AppError('Refresh token is invalid or revoked', 401);
-        }
-
-        await prisma.refreshToken.delete({ where: { id: storedToken.id } });
-
-        const user = await prisma.user.findUnique({ where: { id: payload.sub } });
-
-        if (!user || !user.isActive) {
-            throw new AppError("User no longer active", 401);
-        }
-
-        const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
-        return tokens;
+    if (!user || (!await comparePassword(password, user.passwordHash))) {
+      throw new UnauthorizedError("Invalid email or password");
     }
 
-    async logout(refreshToken: string) {
-        await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+    if (!user.isActive) {
+      throw new ForbiddenError("Account is deactivated");
     }
 
-    async getProfile(userId: string) {
-        const user = await prisma.user.findUnique({ where: { id: userId }});
-
-        if (!user) throw new AppError("User not found", 404);
-        return await this._sanitizeUser(user);
+    try {
+      await this.authRepository.updateLastLogin(user.id);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new InternalServerError("Failed to update user login");
     }
 
-    private async _generateAndSaveTokens(userId: string, email: string, role: UserRole) {
-        const tokens = generateTokenPair(userId, email, role);
+    const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
+    return { user: await this._sanitizeUser(user), ...tokens };
+  }
 
-        const expiresAt = new Date(Date.now() + tokens.refreshExpiresIn * 1000);
+  async refreshTokens(oldRefreshToken: string) {
+    let payload;
 
-        await prisma.refreshToken.create({
-            data: {
-                token: tokens.refreshToken,
-                userId,
-                expiresAt
-            }
-        });
-
-        return tokens;
+    try {
+      payload = verifyRefreshToken(oldRefreshToken);
+    } catch {
+      throw new UnauthorizedError("Invalid or expired refresh token");
     }
 
-    private async _sanitizeUser(user: any) {
-        const { passwordHash, ...sanitized } = user;
-        return sanitized;
+    const storedToken = await this.authRepository.findRefreshToken(oldRefreshToken);
+
+    if (!storedToken || storedToken.expiresAt < new Date()) {
+      if (storedToken) {
+        await this.authRepository.deleteRefreshTokensByUserId(payload.sub);
+      }
+      throw new UnauthorizedError('Refresh token is invalid or revoked');
     }
+
+    try {
+      await this.authRepository.deleteRefreshToken(storedToken.id);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      if (isPrismaRecordNotFound(error)) {
+        throw new UnauthorizedError("Refresh token is invalid or revoked");
+      }
+      throw new InternalServerError("Failed to revoke refresh token");
+    }
+
+    const user = await this.authRepository.findUserById(payload.sub);
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedError("User no longer active");
+    }
+
+    const tokens = await this._generateAndSaveTokens(user.id, user.email, user.role);
+    return tokens;
+  }
+
+  async logout(refreshToken: string) {
+    await this.authRepository.deleteRefreshTokenByToken(refreshToken);
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.authRepository.findUserById(userId);
+
+    if (!user) throw new NotFoundError("User not found");
+    return await this._sanitizeUser(user);
+  }
+
+  private async _generateAndSaveTokens(userId: string, email: string, role: UserRole) {
+    const tokens = generateTokenPair(userId, email, role);
+
+    const expiresAt = new Date(Date.now() + tokens.refreshExpiresIn * 1000);
+
+    try {
+      await this.authRepository.createRefreshToken(tokens.refreshToken, userId, expiresAt);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new InternalServerError("Failed to save session tokens");
+    }
+
+    return tokens;
+  }
+
+  private async _sanitizeUser(user: any) {
+    const { passwordHash, ...sanitized } = user;
+    return sanitized;
+  }
 }
 
-export const authService = new AuthService()
+export const authService = new AuthService(new AuthRepository(prisma));
