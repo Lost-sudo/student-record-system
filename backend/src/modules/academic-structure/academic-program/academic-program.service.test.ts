@@ -1,8 +1,14 @@
-import { Prisma } from "../../../generated/prisma/client";
 import { AcademicProgramService } from './academic-program.service';
 import { AcademicProgramRepository } from './academic-program.repository';
-import { AppError } from '../../../middlewares/error.middleware';
+import { ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils';
 import { CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator';
+
+jest.mock("../../../utils/prisma-error.utils", () => ({
+  isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
+  isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
+  isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
+  isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
+}));
 
 const mockAcademicProgramRepository = {
     create: jest.fn(),
@@ -63,18 +69,20 @@ describe("Academic Program Service", () => {
             });
         });
 
-        it('should throw a 409 Conflict error if a program code already exists', async () => {
-            mockAcademicProgramRepository.create.mockRejectedValue(AppError);
+        it('should throw ConflictError if a program code already exists', async () => {
+            mockAcademicProgramRepository.create.mockRejectedValue({ code: 'P2002', message: 'Unique constraint failed' });
 
-            await expect(service.create(createInput)).rejects.toThrow(AppError);
+            const promise = service.create(createInput);
+            await expect(promise).rejects.toThrow(ConflictError);
+            await expect(promise).rejects.toThrow('A program with this program code already exists');
+        });
 
-            try {
-                await service.create(createInput);
-            } catch (error: any) {
-                expect(error).toBeInstanceOf(AppError);
-                expect(error.statusCode).toBe(409);
-                expect(error.message).toBe('A program with this program code already exists')
-            }
+        it('should throw InternalServerError if the repository throws a database error', async () => {
+            mockAcademicProgramRepository.create.mockRejectedValue(new Error('Database connection lost'));
+
+            const promise = service.create(createInput);
+            await expect(promise).rejects.toThrow(InternalServerError);
+            await expect(promise).rejects.toThrow('Failed to create academic program');
         });
     });
 
@@ -89,23 +97,17 @@ describe("Academic Program Service", () => {
             expect(result.programCode).toBe('BS-CS');
         });
 
-        it('should throw a 404 Not Found error if program does not exist', async () => {
+        it('should throw NotFoundError if program does not exist', async () => {
             mockAcademicProgramRepository.findById.mockResolvedValue(null);
 
-            await expect(service.getById('non-existent-id')).rejects.toThrow(AppError);
-
-            try {
-                await service.getById('non-existent-id');
-            } catch (error: any) {
-                expect(error.statusCode).toBe(404);
-                expect(error).toBeInstanceOf(AppError);
-                expect(error.message).toBe('Academic program not found');
-            }
+            const promise = service.getById('non-existent-id');
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Academic program not found');
         });
     });
 
     describe('update', () => {
-        it('should successfully updae a program and return the updated DTO', async () => {
+        it('should successfully update a program and return the updated DTO', async () => {
             const updatedProgram = { ...mockProgram, name: updateInput.name };
 
             mockAcademicProgramRepository.findById.mockResolvedValue(mockProgram);
@@ -118,24 +120,39 @@ describe("Academic Program Service", () => {
             expect(result.name).toBe('Updated CS Program Name');
         });
 
-        it('should throw 404 Not Found if the program to update does not exist', async () => {
+        it('should throw NotFoundError if the program to update does not exist', async () => {
             mockAcademicProgramRepository.findById.mockResolvedValue(null);
 
-            await expect(service.update('non-existent-id', updateInput)).rejects.toThrow(AppError);
+            const promise = service.update('non-existent-id', updateInput);
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Academic program not found');
         });
 
-        it('should throw 409 Conflict if the updated code violates unique constraint', async () => {
+        it('should throw ConflictError if the updated code violates unique constraint', async () => {
             mockAcademicProgramRepository.findById.mockResolvedValue(mockProgram);
-            mockAcademicProgramRepository.update.mockRejectedValue(AppError);
+            mockAcademicProgramRepository.update.mockRejectedValue({ code: 'P2002', message: 'Unique constraint failed' });
 
-            await expect(service.update(mockProgram.id, { programCode: 'EXISTING-CODE' })).rejects.toThrow(AppError);
+            const promise = service.update(mockProgram.id, { programCode: 'EXISTING-CODE' });
+            await expect(promise).rejects.toThrow(ConflictError);
+            await expect(promise).rejects.toThrow('Academic program with this program code cannot be updated');
+        });
 
-            try {
-                await service.update(mockProgram.id, { programCode: 'EXISTING-CODE' });
-            } catch (error: any) {
-                expect(error.statusCode).toBe(409);
-                expect(error.message).toBe('Academic program with this program code cannot be updated');
-            }
+        it('should throw NotFoundError if the program is removed concurrently (P2025)', async () => {
+            mockAcademicProgramRepository.findById.mockResolvedValue(mockProgram);
+            mockAcademicProgramRepository.update.mockRejectedValue({ code: 'P2025' });
+
+            const promise = service.update(mockProgram.id, { programCode: 'EXISTING-CODE' });
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Academic program not found');
+        });
+
+        it('should throw InternalServerError if the repository throws a database error on update', async () => {
+            mockAcademicProgramRepository.findById.mockResolvedValue(mockProgram);
+            mockAcademicProgramRepository.update.mockRejectedValue(new Error('Database connection lost'));
+
+            const promise = service.update(mockProgram.id, updateInput);
+            await expect(promise).rejects.toThrow(InternalServerError);
+            await expect(promise).rejects.toThrow('Failed to update academic program');
         });
     });
 
@@ -150,25 +167,31 @@ describe("Academic Program Service", () => {
             expect(mockAcademicProgramRepository.delete).toHaveBeenCalledWith(mockProgram.id);
         });
 
-        it('should throw 404 Not Found if the program to delete does not exist', async () => {
+        it('should throw NotFoundError if the program to delete does not exist', async () => {
             mockAcademicProgramRepository.findById.mockResolvedValue(null);
 
-            await expect(service.delete('non-existent-id')).rejects.toThrow(AppError);
+            const promise = service.delete('non-existent-id');
+            await expect(promise).rejects.toThrow(NotFoundError);
+            await expect(promise).rejects.toThrow('Academic program not found');
         });
 
-        it('should throw a 409 Conflict if the program failed to delete due to conflicts in relational dependencies', async () => {
+        it('should throw ConflictError if the program failed to delete due to conflicts in relational dependencies', async () => {
             mockAcademicProgramRepository.findById.mockResolvedValue(mockProgram);
-            mockAcademicProgramRepository.delete.mockRejectedValue(AppError);
+            mockAcademicProgramRepository.delete.mockRejectedValue({ code: 'P2003', message: 'Foreign key constraint failed' });
 
-            await expect(service.delete(mockProgram.id)).rejects.toThrow(AppError);
+            const promise = service.delete(mockProgram.id);
+            await expect(promise).rejects.toThrow(ConflictError);
+            await expect(promise).rejects.toThrow('Failed to delete this program code');
+        });
 
-            try {
-                await service.delete(mockProgram.id);
-            } catch (error: any) {
-                expect(error.statusCode).toBe(409);
-                expect(error.message).toBe("Failed to delete this program code")
-            }
-        })
+        it('should throw InternalServerError if the repository throws an error', async () => {
+            mockAcademicProgramRepository.findById.mockResolvedValue(mockProgram);
+            mockAcademicProgramRepository.delete.mockRejectedValue(new Error('Database connection lost'));
+
+            const promise = service.delete(mockProgram.id);
+            await expect(promise).rejects.toThrow(InternalServerError);
+            await expect(promise).rejects.toThrow('Failed to delete academic program');
+        });
     });
 
     describe('list', () => {

@@ -1,6 +1,6 @@
-import { th } from 'zod/v4/locales/index.js';
 import { AcademicProgram } from '../../../generated/prisma/client';
-import { AppError } from '../../../middlewares/error.middleware';
+import { AppError, ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils';
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from '../../../utils/prisma-error.utils';
 import { PaginationMeta, buildPaginationMeta } from '../../../utils/pagination';
 import { AcademicProgramRepository } from './academic-program.repository';
 import { AcademicProgramDto, AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.types';
@@ -13,7 +13,11 @@ export class AcademicProgramService {
             const program = await this.academicProgramRepository.create(input);
             return this.toDto(program);
         } catch (error) {
-            throw new AppError("A program with this program code already exists", 409);
+            if (error instanceof AppError) throw error;
+            if (isUniqueConstraintViolation(error)) {
+                throw new ConflictError("A program with this program code already exists");
+            }
+            throw new InternalServerError("Failed to create academic program");
         }
     }
 
@@ -21,7 +25,7 @@ export class AcademicProgramService {
         const program = await this.academicProgramRepository.findById(id);
 
         if (!program) {
-            throw new AppError("Academic program not found", 404);
+            throw new NotFoundError("Academic program not found");
         }
 
         return this.toDto(program);
@@ -34,7 +38,14 @@ export class AcademicProgramService {
             const updated = await this.academicProgramRepository.update(id, input);
             return this.toDto(updated);
         } catch (error) {
-            throw new AppError("Academic program with this program code cannot be updated", 409);
+            if (error instanceof AppError) throw error;
+            if (isUniqueConstraintViolation(error)) {
+                throw new ConflictError("Academic program with this program code cannot be updated");
+            }
+            if (isPrismaRecordNotFound(error)) {
+                throw new NotFoundError("Academic program not found");
+            }
+            throw new InternalServerError("Failed to update academic program");
         }
     }
 
@@ -44,7 +55,14 @@ export class AcademicProgramService {
         try {
             await this.academicProgramRepository.delete(id);
         } catch (error) {
-            throw new AppError("Failed to delete this program code", 409);
+            if (error instanceof AppError) throw error;
+            if (isForeignKeyConstraintViolation(error)) {
+                throw new ConflictError("Failed to delete this program code");
+            }
+            if (isPrismaRecordNotFound(error)) {
+                throw new NotFoundError("Academic program not found");
+            }
+            throw new InternalServerError("Failed to delete academic program");
         }
     }
 
