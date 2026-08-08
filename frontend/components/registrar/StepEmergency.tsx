@@ -21,7 +21,7 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
         <div className="flex-1">
           <div className="text-sm font-semibold text-amber-300">Important Notice</div>
           <p className="text-xs text-amber-200/70 mt-0.5">
-            Emergency contact information is required for enrollment compliance. Please fill in at least the contact name and one method of contact (phone or email).
+            Emergency contact information is required for enrollment compliance. Please fill in at least the contact name, relationship, and phone number.
           </p>
         </div>
       </div>
@@ -35,17 +35,17 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
           <input
             type="text"
             placeholder="e.g. Jane Doe"
-            {...register('ecName')}
+            {...register('emergencyContact.name')}
             className={`w-full py-2.5 px-4 bg-slate-800 border rounded-xl text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-slate-700 transition duration-200 ${
-              errors.ecName
+              errors.emergencyContact?.name
                 ? 'border-red-400 focus:ring-red-500'
                 : 'border-slate-600 focus:ring-indigo-400 focus:border-transparent'
             }`}
           />
-          {errors.ecName && (
+          {errors.emergencyContact?.name && (
             <p className="mt-1.5 text-sm text-red-400 flex items-center gap-1">
               <span className="w-1 h-1 rounded-full bg-red-400"></span>
-              {errors.ecName.message}
+              {errors.emergencyContact.name.message}
             </p>
           )}
         </div>
@@ -56,9 +56,9 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
             Relationship <span className="text-red-400">*</span>
           </label>
           <select
-            {...register('ecRelationship')}
+            {...register('emergencyContact.relationship')}
             className={`w-full py-2.5 px-4 bg-slate-800 border rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:bg-slate-700 transition duration-200 ${
-              errors.ecRelationship
+              errors.emergencyContact?.relationship
                 ? 'border-red-400 focus:ring-red-500'
                 : 'border-slate-600 focus:ring-indigo-400 focus:border-transparent'
             }`}
@@ -70,10 +70,10 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
             <option value="sibling">Sibling</option>
             <option value="other">Other</option>
           </select>
-          {errors.ecRelationship && (
+          {errors.emergencyContact?.relationship && (
             <p className="mt-1.5 text-sm text-red-400 flex items-center gap-1">
               <span className="w-1 h-1 rounded-full bg-red-400"></span>
-              {errors.ecRelationship.message}
+              {errors.emergencyContact.relationship.message}
             </p>
           )}
         </div>
@@ -90,18 +90,18 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
             <input
               type="tel"
               placeholder="+1 (555) 987-6543"
-              {...register('ecPhone')}
+              {...register('emergencyContact.phone')}
               className={`w-full py-2.5 pl-10 pr-4 bg-slate-800 border rounded-xl text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-slate-700 transition duration-200 ${
-                errors.ecPhone
+                errors.emergencyContact?.phone
                   ? 'border-red-400 focus:ring-red-500'
                   : 'border-slate-600 focus:ring-indigo-400 focus:border-transparent'
               }`}
             />
           </div>
-          {errors.ecPhone && (
+          {errors.emergencyContact?.phone && (
             <p className="mt-1.5 text-sm text-red-400 flex items-center gap-1">
               <span className="w-1 h-1 rounded-full bg-red-400"></span>
-              {errors.ecPhone.message}
+              {errors.emergencyContact.phone.message}
             </p>
           )}
         </div>
@@ -116,7 +116,7 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
             <input
               type="email"
               placeholder="contact@example.com"
-              {...register('ecEmail')}
+              {...register('emergencyContact.email')}
               className="w-full py-2.5 pl-10 pr-4 bg-slate-800 border border-slate-600 rounded-xl text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-slate-700 transition duration-200"
             />
           </div>
@@ -124,15 +124,16 @@ export default function StepEmergency({ register, errors }: StepEmergencyProps) 
         </div>
       </div>
 
-      {/* Contact Address */}
-      <div>
-        <label className="block text-sm font-medium text-slate-300 mb-2">Contact Address</label>
-        <input
-          type="text"
-          placeholder="Street address, City, Country"
-          {...register('ecAddress')}
-          className="w-full py-2.5 px-4 bg-slate-800 border border-slate-600 rounded-xl text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-slate-700 transition duration-200"
-        />
+      {/* Primary Contact Toggle */}
+      <div className="flex items-center justify-between p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl">
+        <div>
+          <div className="text-sm font-medium text-slate-200">Primary Contact</div>
+          <p className="text-xs text-slate-400 mt-0.5">Mark as the primary emergency contact for this student</p>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" className="sr-only peer" {...register('emergencyContact.isPrimary')} />
+          <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+        </label>
       </div>
     </div>
   );
