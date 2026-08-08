@@ -11,6 +11,7 @@ export type CurriculumVersionDto = {
   effectiveTermId: PrismaCurriculumVersion["effectiveTermId"];
   totalCredits: PrismaCurriculumVersion["totalCredits"];
   description: PrismaCurriculumVersion["description"];
+  versionNumber: PrismaCurriculumVersion["versionNumber"];
   isActive: PrismaCurriculumVersion["isActive"];
   createdAt: PrismaCurriculumVersion["createdAt"];
   updatedAt: PrismaCurriculumVersion["updatedAt"];

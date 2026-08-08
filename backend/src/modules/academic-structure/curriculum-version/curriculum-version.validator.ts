@@ -14,7 +14,7 @@ export const updateCurriculumVersionSchema = z.object({
   versionNumber: z.number().int().min(1).optional(),
   totalCredits: z.number().int().min(1).optional(),
   description: z.string().trim().max(2000).nullable().optional(),
-  isActive: z.boolean().optional().default(true),
+  isActive: z.boolean().optional(),
 });
 
 export const curriculumVersionQuerySchema = z.object({
