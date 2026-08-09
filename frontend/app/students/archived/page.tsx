@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { archivedStudentsData } from '@/lib/data';
-import { ArchivedFilterState } from '@/lib/types';
+import { useState, useEffect, useMemo } from 'react';
+import { toast as sonnerToast } from 'sonner';
+import { useArchivedStudents, formatStudentName } from '@/api/students';
+import { ArchivedFilterState, ArchivedStudent } from '@/lib/types';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
 import AmbientBackground from '@/components/ui/AmbientBackground';
@@ -10,25 +11,47 @@ import ArchivedStudentFilters from '@/components/students/ArchivedStudentFilters
 import ArchivedStudentTable from '@/components/students/ArchivedStudentTable';
 
 export default function ArchivedStudentsPage() {
-  const [filters, setFilters] = useState<ArchivedFilterState>({ search: '', reason: '', program: '' });
+  const [filters, setFilters] = useState<ArchivedFilterState>({ search: '', gender: '', program: '' });
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 10;
 
+  const archivedQuery = useArchivedStudents({ limit: 100 });
+
+  useEffect(() => {
+    if (archivedQuery.isError) {
+      sonnerToast.error('Failed to load archived students', {
+        description: 'Please try again later.',
+      });
+    }
+  }, [archivedQuery.isError]);
+
+  const archivedStudents = useMemo<ArchivedStudent[]>(() => {
+    return (archivedQuery.data?.data ?? []).map((student) => ({
+      id: student.studentNumber ?? student.id,
+      name: formatStudentName(student),
+      email: student.email ?? '—',
+      program: '—',
+      gender: student.gender ?? '',
+      avatar: `${student.firstName.charAt(0)}${student.lastName.charAt(0)}`.toUpperCase(),
+      archivedAt: student.deletedAt ?? student.updatedAt,
+    }));
+  }, [archivedQuery.data]);
+
   // Memoized filtering for performance
   const filteredStudents = useMemo(() => {
-    return archivedStudentsData.filter(student => {
+    return archivedStudents.filter(student => {
       const matchesSearch = !filters.search || 
         student.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         student.id.toLowerCase().includes(filters.search.toLowerCase()) ||
         student.email.toLowerCase().includes(filters.search.toLowerCase());
       
-      const matchesReason = !filters.reason || student.reason === filters.reason;
+      const matchesGender = !filters.gender || student.gender === filters.gender;
       const matchesProgram = !filters.program || student.program === filters.program;
 
-      return matchesSearch && matchesReason && matchesProgram;
+      return matchesSearch && matchesGender && matchesProgram;
     });
-  }, [filters]);
+  }, [archivedStudents, filters]);
 
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
   const start = (currentPage - 1) * studentsPerPage;
@@ -142,6 +165,7 @@ export default function ArchivedStudentsPage() {
               end={end}
               total={filteredStudents.length}
               onPageChange={setCurrentPage}
+              isLoading={archivedQuery.isLoading}
             />
 
             {/* Footer */}

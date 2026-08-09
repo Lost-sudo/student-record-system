@@ -62,6 +62,35 @@ export class StudentRepository {
     });
   }
 
+  async findArchived(params: StudentQueryInput): Promise<{ items: Student[]; total: number }> {
+    const where: Prisma.StudentWhereInput = { deletedAt: { not: null } };
+
+    if (params.searchQuery) {
+      where.OR = [
+        { firstName: { contains: params.searchQuery, mode: "insensitive" } },
+        { lastName: { contains: params.searchQuery, mode: "insensitive" } },
+        { studentNumber: { contains: params.searchQuery, mode: "insensitive" } },
+      ];
+    }
+
+    const skip = (params.page - 1) * params.limit;
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.student.findMany({
+        where,
+        skip,
+        take: params.limit,
+        orderBy: { deletedAt: "desc" },
+        include: {
+          contactInfo: true,
+        },
+      }),
+      this.prisma.student.count({ where }),
+    ]);
+
+    return { items, total };
+  }
+
   async findMany(params: StudentQueryInput): Promise<{ items: Student[]; total: number }> {
     const where: Prisma.StudentWhereInput = { deletedAt: null };
 

@@ -53,6 +53,14 @@ export class StudentService {
     };
   }
 
+  async listArchived(query: StudentQueryInput): Promise<{ items: StudentDto[]; meta: PaginationMeta }> {
+    const { items, total } = await this.studentRepository.findArchived(query);
+    return {
+      items: items.map((item) => this.toDto(item)),
+      meta: buildPaginationMeta(query.page, query.limit, total),
+    };
+  }
+
   async getStudents(
     query: Partial<StudentQueryInput>,
   ): Promise<{ data: StudentDto[]; total: number; page: number; totalPages: number }> {

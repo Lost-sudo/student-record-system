@@ -15,6 +15,7 @@ router.use(authenticate);
 
 router.post("/", authorize("REGISTRAR", "SUPER_ADMIN"), controller.createStudent);
 router.get("/", authorize("REGISTRAR", "SUPER_ADMIN"), controller.getStudents);
+router.get("/archived", authorize("REGISTRAR", "SUPER_ADMIN"), controller.getArchivedStudents);
 router.get("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), controller.getStudentById);
 router.patch("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), controller.updateStudent);
 router.delete("/:id", authorize("REGISTRAR", "SUPER_ADMIN"), controller.softDeleteStudent);

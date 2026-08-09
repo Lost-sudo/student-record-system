@@ -2,15 +2,22 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { toast as sonnerToast } from 'sonner';
-import { useStudents, formatStudentName, StudentDto } from '@/api/students';
+import { useStudents, useDeleteStudent, formatStudentName, StudentDto } from '@/api/students';
 import { FilterState, Student } from '@/lib/types';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
 import { AddStudentModal } from '@/components/dashboard';
 import AmbientBackground from '@/components/ui/AmbientBackground';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import StudentFilters from '@/components/students/StudentFilters';
 import StudentTable from '@/components/students/StudentTable';
 import ViewStudentModal from '@/components/students/ViewStudentModal';
+import EditStudentModal from '@/components/students/EditStudentModal';
+
+interface PendingDelete {
+  ids: string[];
+  label: string;
+}
 
 export default function StudentsPage() {
   const [filters, setFilters] = useState<FilterState>({ search: '', status: '', program: '' });
@@ -18,9 +25,12 @@ export default function StudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [viewingStudent, setViewingStudent] = useState<StudentDto | null>(null);
+  const [editingStudent, setEditingStudent] = useState<StudentDto | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
   const studentsPerPage = 10;
 
   const studentsQuery = useStudents({ limit: 100 });
+  const deleteStudent = useDeleteStudent();
 
   useEffect(() => {
     if (studentsQuery.isError) {
@@ -94,6 +104,44 @@ export default function StudentsPage() {
     if (dto) setViewingStudent(dto);
   };
 
+  const handleEdit = (id: string) => {
+    const dto = studentById.get(id);
+    if (dto) setEditingStudent(dto);
+  };
+
+  const handleDelete = (id: string) => {
+    const dto = studentById.get(id);
+    if (!dto) return;
+    setPendingDelete({ ids: [dto.id], label: formatStudentName(dto) });
+  };
+
+  const handleArchiveSelected = () => {
+    if (selectedIds.size === 0) return;
+    const ids: string[] = [];
+    selectedIds.forEach((displayId) => {
+      const dto = studentById.get(displayId);
+      if (dto) ids.push(dto.id);
+    });
+    setPendingDelete({ ids, label: `${ids.length} selected students` });
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    pendingDelete.ids.forEach((id) => {
+      deleteStudent.mutate(id, {
+        onError: () =>
+          sonnerToast.error('Failed to archive student', {
+            description: 'An unexpected error occurred. Please try again.',
+          }),
+      });
+    });
+    sonnerToast.success(pendingDelete.ids.length > 1 ? 'Students archived successfully' : 'Student archived successfully', {
+      description: pendingDelete.label,
+    });
+    setSelectedIds(new Set());
+    setPendingDelete(null);
+  };
+
   const breadcrumbs = [
     { label: 'Home', href: '/' },
     { label: 'Student Records', href: '/students' },
@@ -146,7 +194,7 @@ export default function StudentsPage() {
               selectedCount={selectedIds.size}
               onClearSelection={() => setSelectedIds(new Set())}
               onBulkUpdate={() => alert(`Bulk update triggered for ${selectedIds.size} students`)}
-              onArchiveSelected={() => alert(`Archive triggered for ${selectedIds.size} students`)}
+              onArchiveSelected={handleArchiveSelected}
             />
 
             {/* Data Table */}
@@ -162,6 +210,8 @@ export default function StudentsPage() {
               total={filteredStudents.length}
               onPageChange={setCurrentPage}
               onView={handleView}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
               isLoading={studentsQuery.isLoading}
             />
 
@@ -193,6 +243,29 @@ export default function StudentsPage() {
           onClose={() => setViewingStudent(null)}
         />
       )}
+
+      {editingStudent && (
+        <EditStudentModal
+          student={editingStudent}
+          onClose={() => setEditingStudent(null)}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={!!pendingDelete}
+        title={pendingDelete && pendingDelete.ids.length > 1 ? 'Archive students' : 'Archive student'}
+        description={
+          pendingDelete
+            ? pendingDelete.ids.length > 1
+              ? `${pendingDelete.label} will be removed from the Active Students list. You can restore them from the Archived page later.`
+              : `${pendingDelete.label} will be removed from the Active Students list. You can restore them later from the Archived page.`
+            : ''
+        }
+        confirmLabel="Archive"
+        isConfirming={deleteStudent.isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
