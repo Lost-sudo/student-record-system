@@ -1,0 +1,22 @@
+model CurriculumVersion {
+  id              String          @id @default(uuid())
+  programId       String
+  program         AcademicProgram @relation(fields: [programId], references: [id], onDelete: Restrict)
+  
+  effectiveTermId String
+  effectiveTerm   AcademicTerm    @relation(fields: [effectiveTermId], references: [id], onDelete: Restrict)
+  
+  versionNumber   Int
+  totalCredits    Int
+  description     String?
+  isActive        Boolean         @default(true)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  degreeRequirements DegreeRequirement[]
+  studentPrograms    StudentProgram[]
+
+  @@unique([programId, versionNumber])
+  @@index([programId, isActive])
+}

@@ -1,60 +1,52 @@
-import {Request, Response} from "express";
-import {contactService} from "./contact.service";
-import {AppError} from "../../middlewares/error.middleware";
-import {asyncHandler} from "../../utils/asyncHandler";
+import { Request, Response } from "express";
+import { asyncHandler } from "../../utils/asyncHandler";
+import { studentIdParamsSchema, uuidParamsSchema } from "../../utils/zod";
+import { ContactService } from "./contact.service";
 
-export const getContactInfoByStudentId = asyncHandler(async (req: Request, res: Response) => {
-    const { studentId } = req.params;
-    const contactInfo = await contactService.getContactInfoByStudentId(studentId as string);
+export class ContactController {
+  constructor(private readonly contactService: ContactService) {}
 
-    res.status(200).json({
-        success: true,
-        message: "Student contact information fetched successfully",
-        data: {
-            contactInfo: contactInfo,
-        }
-    })
-});
+  getContactInfoByStudentId = asyncHandler(async (req: Request, res: Response) => {
+    const { studentId } = studentIdParamsSchema.parse(req.params);
+    const contactInfo = await this.contactService.getContactInfoByStudentId(studentId);
 
-export const createContactInfo = asyncHandler(async (req: Request, res: Response) => {
-    const { studentId } = req.params;
-    const contactData = req.body;
-
-    const newContactInfo = await contactService.createContactInfo(studentId as string, contactData);
-    res.status(201).json({
-        success: true,
-        message: "Contact created successfully",
-        data: {
-            contactInfo: newContactInfo,
-        }
-    })
-});
-
-export const updateContactInfo = asyncHandler(async (req: Request, res: Response) => {
-    const { studentId } = req.params;
-    const updateData = req.body;
-
-    const updatedContactInfo = await contactService.updateContactInfo(studentId as string, updateData);
-
-    res.status(200).json({
-        success: true,
-        message: "Contact updated successfully",
-        data: {
-            contactInfo: updatedContactInfo,
-        }
+    return res.status(200).json({
+      success: true,
+      message: "Student contact information fetched successfully",
+      data: { contactInfo },
     });
-});
+  });
 
-export const deleteContactInfo = asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+  createContactInfo = asyncHandler(async (req: Request, res: Response) => {
+    const { studentId } = studentIdParamsSchema.parse(req.params);
+    const newContactInfo = await this.contactService.createContactInfo(studentId, req.body);
 
-    const deletedContact = await contactService.deleteContactInfo(id as string);
-
-    res.status(200).json({
-        success: true,
-        message: "Contact deleted successfully",
-        data: {
-            contactInfo: deletedContact,
-        }
+    return res.status(201).json({
+      success: true,
+      message: "Contact created successfully",
+      data: { contactInfo: newContactInfo },
     });
-});
+  });
+
+  updateContactInfo = asyncHandler(async (req: Request, res: Response) => {
+    const { studentId } = studentIdParamsSchema.parse(req.params);
+    const updatedContactInfo = await this.contactService.updateContactInfo(studentId, req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Contact updated successfully",
+      data: { contactInfo: updatedContactInfo },
+    });
+  });
+
+  deleteContactInfo = asyncHandler(async (req: Request, res: Response) => {
+    const { id } = uuidParamsSchema.parse(req.params);
+    const deletedContact = await this.contactService.deleteContactInfo(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Contact deleted successfully",
+      data: { contactInfo: deletedContact },
+    });
+  });
+}

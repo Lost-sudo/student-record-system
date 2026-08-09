@@ -1,0 +1,14 @@
+model AcademicTerm {
+  id        String   @id @default(uuid())
+  termCode  String   @unique
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  curriculumVersions CurriculumVersion[]
+  courseSections     CourseSection[]
+}

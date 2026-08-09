@@ -2,9 +2,16 @@ import { authService } from "./auth.service";
 import { prisma } from "../../database/prisma";
 import { hashPassword, comparePassword } from "../../utils/password.utils";
 import { generateTokenPair, verifyRefreshToken } from "../../utils/jwt.utils";
-import { AppError } from "../../middlewares/error.middleware";
+import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "../../utils/error.utils";
 import { UserRole } from "../../generated/prisma/enums";
 import { email } from "zod";
+
+jest.mock("../../utils/prisma-error.utils", () => ({
+  isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
+  isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
+  isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
+  isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
+}));
 
 // Mocks
 jest.mock("../../database/prisma", () => ({
@@ -97,12 +104,12 @@ describe('AuthService', () => {
             expect(result.accessToken).toBe("mock_access_token");
         });
 
-        it("should throw AppError if email or username already exists", async () => {
+        it("should throw ConflictError if email or username already exists", async () => {
             mockPrisma.user.findFirst.mockResolvedValue(mockUser);
 
             await expect(
                 authService.register("test@example.com", "testuser", "password123", "STUDENT")
-            ).rejects.toThrow(AppError);
+            ).rejects.toThrow(ConflictError);
 
             expect(mockPrisma.user.create).not.toHaveBeenCalled();
         });
@@ -125,31 +132,31 @@ describe('AuthService', () => {
             expect(result.accessToken).toBe("mock_access_token");
         });
 
-        it("should throw AppError if user is not found", async() => {
+        it("should throw UnauthorizedError if user is not found", async() => {
             mockPrisma.user.findUnique.mockResolvedValue(null);
 
-            await expect(
-                authService.login("wrong@example.com", "password123")
-            ).rejects.toThrow("Invalid email or password");
+            const loginPromise = authService.login("wrong@example.com", "password123");
+            await expect(loginPromise).rejects.toThrow(UnauthorizedError);
+            await expect(loginPromise).rejects.toThrow("Invalid email or password");
         });
 
-        it("should throw AppError if password is incorrect", async() => {
+        it("should throw UnauthorizedError if password is incorrect", async() => {
             mockPrisma.user.findUnique.mockResolvedValue(mockUser);
             mockComparePassword.mockResolvedValue(false);
 
-            await expect(
-                authService.login("test@example.com", "wrongpassword")
-            ).rejects.toThrow("Invalid email or password");
+            const loginPromise = authService.login("test@example.com", "wrongpassword");
+            await expect(loginPromise).rejects.toThrow(UnauthorizedError);
+            await expect(loginPromise).rejects.toThrow("Invalid email or password");
         });
 
-        it("should throw AppError is user account is deactivated", async() => {
+        it("should throw ForbiddenError if user account is deactivated", async() => {
             const inactiveUser = {...mockUser, isActive: false};
             mockPrisma.user.findUnique.mockResolvedValue(inactiveUser);
             mockComparePassword.mockResolvedValue(true);
 
-            await expect(
-                authService.login("test@example.com", "wrongpassword")
-            ).rejects.toThrow("Account is deactivated");
+            const loginPromise = authService.login("test@example.com", "wrongpassword");
+            await expect(loginPromise).rejects.toThrow(ForbiddenError);
+            await expect(loginPromise).rejects.toThrow("Account is deactivated");
         });
     });
 
@@ -179,15 +186,15 @@ describe('AuthService', () => {
             expect(result.accessToken).toBe('mock_access_token');
         });
 
-        it('should throw AppError if JWT verification fails', async () => {
+        it('should throw UnauthorizedError if JWT verification fails', async () => {
             mockVerifyRefreshToken.mockImplementation(() => { throw new Error('Invalid token'); });
 
-            await expect(
-                authService.refreshTokens('invalid_token')
-            ).rejects.toThrow('Invalid or expired refresh token');
+            const refreshPromise = authService.refreshTokens('invalid_token');
+            await expect(refreshPromise).rejects.toThrow(UnauthorizedError);
+            await expect(refreshPromise).rejects.toThrow('Invalid or expired refresh token');
         });
 
-        it('should throw AppError and revoke all tokens if stored token is expired', async () => {
+        it('should throw UnauthorizedError and revoke all tokens if stored token is expired', async () => {
             const pastDate = new Date(Date.now() - 100000);
             
             mockVerifyRefreshToken.mockReturnValue({ 
@@ -202,9 +209,9 @@ describe('AuthService', () => {
                 createdAt: new Date(),
             });
 
-            await expect(
-                authService.refreshTokens('expired_token')
-            ).rejects.toThrow('Refresh token is invalid or revoked');
+            const refreshPromise = authService.refreshTokens('expired_token');
+            await expect(refreshPromise).rejects.toThrow(UnauthorizedError);
+            await expect(refreshPromise).rejects.toThrow('Refresh token is invalid or revoked');
 
             // Security measure: Should delete ALL tokens for this user
             expect(mockPrisma.refreshToken.deleteMany).toHaveBeenCalledWith({
@@ -232,10 +239,12 @@ describe('AuthService', () => {
             expect(result.email).toBe('test@example.com');
         });
 
-        it('should throw AppError if user is not found', async () => {
+        it('should throw NotFoundError if user is not found', async () => {
             mockPrisma.user.findUnique.mockResolvedValue(null);
 
-            await expect(authService.getProfile('invalid-id')).rejects.toThrow('User not found');
+            const profilePromise = authService.getProfile('invalid-id');
+            await expect(profilePromise).rejects.toThrow(NotFoundError);
+            await expect(profilePromise).rejects.toThrow('User not found');
         });
     });
 })

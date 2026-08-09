@@ -1,0 +1,20 @@
+model CourseSection {
+  id             String       @id @default(uuid())
+  courseId         String
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  
+  termId         String
+  term           AcademicTerm @relation(fields: [termId], references: [id], onDelete: Restrict)
+  
+  sectionNumber  String
+  capacity       Int
+  enrolledCount  Int          @default(0)
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  enrollments    Enrollment[]
+
+  @@unique([courseId, termId, sectionNumber])
+  @@index([termId, courseId])
+}

@@ -17,6 +17,8 @@ model Student {
 
   contactInfo       ContactInfo?
   emergencyContacts EmergencyContact[]
+  studentPrograms StudentProgram[]
+  enrollments Enrollment[]
 
   @@index([lastName, firstName])
   @@index([deletedAt])

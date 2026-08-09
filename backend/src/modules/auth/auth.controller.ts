@@ -1,83 +1,87 @@
 import { Request, Response } from "express";
-import { authService } from "./auth.service";
+import { AuthService } from "./auth.service";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { env } from "../../config/env";
 
 const setRefreshTokenCookie = (res: Response, token: string, maxAgeInSeconds: number) => {
-    res.cookie('refreshToken', token, {
-        httpOnly: true,
-        secure: env.nodeEnv === "production",
-        sameSite: "strict",
-        maxAge: maxAgeInSeconds * 1000,
-        path: "/",
-    });
+  res.cookie('refreshToken', token, {
+    httpOnly: true,
+    secure: env.nodeEnv === "production",
+    sameSite: "strict",
+    maxAge: maxAgeInSeconds * 1000,
+    path: "/",
+  });
 };
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  register = asyncHandler(async (req: Request, res: Response) => {
     const { email, username, password, role } = req.body;
 
-    const result = await authService.register(email, username, password, role);
+    const result = await this.authService.register(email, username, password, role);
 
     setRefreshTokenCookie(res, result.refreshToken, result.refreshExpiresIn);
 
     res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        user: result.user,
-        accessToken: result.accessToken,
+      success: true,
+      message: "User registered successfully",
+      user: result.user,
+      accessToken: result.accessToken,
     });
-});
+  });
 
-export const login = asyncHandler(async (req: Request, res: Response) => {
+  login = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const result = await authService.login(email, password);
+    const result = await this.authService.login(email, password);
 
     setRefreshTokenCookie(res, result.refreshToken, result.refreshExpiresIn);
 
     res.status(200).json({
-        success: true,
-        message: "Login successful",
-        user: result.user,
-        accessToken: result.accessToken,
+      success: true,
+      message: "Login successful",
+      user: result.user,
+      accessToken: result.accessToken,
 
     });
-});
+  });
 
-export const refresh = asyncHandler(async (req: Request, res: Response) => {
+  refresh = asyncHandler(async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies;
 
-    const tokens = await authService.refreshTokens(refreshToken);
+    const tokens = await this.authService.refreshTokens(refreshToken);
 
     setRefreshTokenCookie(res, tokens.refreshToken, tokens.refreshExpiresIn);
 
     res.status(200).json({
-        success: true,
-        message: "Token refresh successfully",
-        accessToken: tokens.accessToken,
+      success: true,
+      message: "Token refresh successfully",
+      accessToken: tokens.accessToken,
     });
-});
+  });
 
-export const logout = asyncHandler(async (req: Request, res: Response) => {
+  logout = asyncHandler(async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies;
 
     if (refreshToken) {
-        authService.logout(refreshToken);
+      await this.authService.logout(refreshToken);
     }
 
     res.clearCookie("refreshToken", { path: "/" });
 
     res.status(200).json({
-        success: true,
-        message: "Logged out successfully",
+      success: true,
+      message: "Logged out successfully",
     });
-});
+  });
 
-export const getMe = asyncHandler(async (req: Request, res: Response) => {
-    const user = await authService.getProfile(req.user!.id);
+  getMe = asyncHandler(async (req: Request, res: Response) => {
+    const user = await this.authService.getProfile(req.user!.id);
 
     res.status(200).json({
-        success: true,
-        user,
+      success: true,
+      user,
     });
-});
+  });
+}
