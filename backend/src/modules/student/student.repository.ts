@@ -81,6 +81,9 @@ export class StudentRepository {
         skip,
         take: params.limit,
         orderBy: { createdAt: "desc" },
+        include: {
+          contactInfo: true,
+        },
       }),
       this.prisma.student.count({ where }),
     ]);

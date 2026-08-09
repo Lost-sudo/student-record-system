@@ -11,6 +11,7 @@ export type StudentDto = {
   dateOfBirth: PrismaStudent["dateOfBirth"];
   gender: PrismaStudent["gender"];
   nationality: PrismaStudent["nationality"];
+  email: string | null;
   deletedAt: PrismaStudent["deletedAt"];
   createdAt: PrismaStudent["createdAt"];
   updatedAt: PrismaStudent["updatedAt"];
