@@ -9,7 +9,7 @@ import { courseRouter } from "../modules/academic-structure/course/course.routes
 import { coursePrerequisiteRouter } from "../modules/academic-structure/course-prerequisite/course-prerequisite.routes";
 import { curriculumVersionRouter } from "../modules/academic-structure/curriculum-version/curriculum-version.routes";
 import { degreeRequirementRouter } from "../modules/degree-requirement/degree-requirement.routes";
-
+import { courseSectionRouter } from "../modules/academic-structure/course-section/course-section.routes";
 const routes = Router();
 
 routes.use("/health", healthRouter);
@@ -22,5 +22,6 @@ routes.use("/course", courseRouter);
 routes.use("/course-prerequisite", coursePrerequisiteRouter);
 routes.use("/curriculum-version", curriculumVersionRouter);
 routes.use("/degree-requirement", degreeRequirementRouter);
+routes.use("/course-section", courseSectionRouter);
 
 export default routes;
