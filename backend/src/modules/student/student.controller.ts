@@ -30,6 +30,18 @@ export class StudentController {
     });
   });
 
+  getArchivedStudents = asyncHandler(async (req: Request, res: Response) => {
+    const query = studentQuerySchema.parse(req.query);
+    const result = await this.service.listArchived(query);
+
+    return res.status(200).json({
+      success: true,
+      message: "Archived students fetched successfully",
+      data: result.items,
+      meta: result.meta,
+    });
+  });
+
   getStudentById = asyncHandler(async (req: Request, res: Response) => {
     const { id } = uuidParamsSchema.parse(req.params);
     const student = await this.service.getById(id);

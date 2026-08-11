@@ -53,6 +53,14 @@ export class StudentService {
     };
   }
 
+  async listArchived(query: StudentQueryInput): Promise<{ items: StudentDto[]; meta: PaginationMeta }> {
+    const { items, total } = await this.studentRepository.findArchived(query);
+    return {
+      items: items.map((item) => this.toDto(item)),
+      meta: buildPaginationMeta(query.page, query.limit, total),
+    };
+  }
+
   async getStudents(
     query: Partial<StudentQueryInput>,
   ): Promise<{ data: StudentDto[]; total: number; page: number; totalPages: number }> {
@@ -145,7 +153,7 @@ export class StudentService {
     return this.delete(studentId);
   }
 
-  private toDto(model: Student): StudentDto {
+  private toDto(model: Student & { contactInfo?: { email: string | null } | null }): StudentDto {
     return {
       id: model.id,
       userId: model.userId,
@@ -156,6 +164,7 @@ export class StudentService {
       dateOfBirth: model.dateOfBirth,
       gender: model.gender,
       nationality: model.nationality,
+      email: model.contactInfo?.email ?? null,
       deletedAt: model.deletedAt,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,

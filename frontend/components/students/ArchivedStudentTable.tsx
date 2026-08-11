@@ -13,6 +13,7 @@ interface ArchivedStudentTableProps {
   end: number;
   total: number;
   onPageChange: (page: number) => void;
+  isLoading?: boolean;
 }
 
 export default function ArchivedStudentTable({
@@ -26,15 +27,15 @@ export default function ArchivedStudentTable({
   end,
   total,
   onPageChange,
+  isLoading,
 }: ArchivedStudentTableProps) {
-  const getReasonBadge = (reason: ArchivedStudent['reason']) => {
-    const badges = {
-      graduated: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      transferred: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-      withdrawn: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-      deleted: 'bg-red-500/10 text-red-400 border-red-500/20',
+  const getGenderLabel = (gender: string) => {
+    const labels: Record<string, string> = {
+      male: 'Male',
+      female: 'Female',
+      undisclosed: 'Prefer not to disclose',
     };
-    return badges[reason] || badges.withdrawn;
+    return labels[gender] || gender || '—';
   };
 
   const isAllSelected = students.length > 0 && students.every((s) => selectedIds.has(s.id));
@@ -56,16 +57,24 @@ export default function ArchivedStudentTable({
               <th className="px-6 py-3 text-left font-semibold">Student</th>
               <th className="px-6 py-3 text-left font-semibold">Email</th>
               <th className="px-6 py-3 text-left font-semibold">Program</th>
-              <th className="px-6 py-3 text-left font-semibold">Archive Reason</th>
+              <th className="px-6 py-3 text-left font-semibold">Gender</th>
               <th className="px-6 py-3 text-left font-semibold">Archived Date</th>
-              <th className="px-6 py-3 text-left font-semibold">Archived By</th>
               <th className="px-6 py-3 text-right font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700/50">
-            {students.length === 0 ? (
+            {isLoading ? (
               <tr>
-                <td colSpan={8} className="px-6 py-16 text-center">
+                <td colSpan={7} className="px-6 py-16 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 rounded-full border-2 border-slate-600 border-t-indigo-500 animate-spin"></div>
+                    <div className="text-slate-400">Loading archived students...</div>
+                  </div>
+                </td>
+              </tr>
+            ) : students.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center gap-3">
                     <svg className="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -98,16 +107,11 @@ export default function ArchivedStudentTable({
                     </div>
                   </td>
                   <td className="px-6 py-4 text-slate-400">{student.email}</td>
-                  <td className="px-6 py-4 text-slate-400">{student.program}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-block px-2.5 py-1 text-xs font-semibold rounded-lg border ${getReasonBadge(student.reason)}`}>
-                      {student.reason.charAt(0).toUpperCase() + student.reason.slice(1)}
-                    </span>
-                  </td>
+                  <td className="px-6 py-4 text-slate-400">{student.program || '—'}</td>
+                  <td className="px-6 py-4 text-slate-400">{getGenderLabel(student.gender)}</td>
                   <td className="px-6 py-4 text-slate-400">
-                    {new Date(student.archivedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {new Date(student.archivedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                   </td>
-                  <td className="px-6 py-4 text-slate-400">{student.archivedBy}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors" aria-label="View student">

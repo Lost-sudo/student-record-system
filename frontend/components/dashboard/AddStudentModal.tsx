@@ -1,33 +1,17 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import StudentForm from '@/components/registrar/StudentForm';
-import { AddStudentFormData } from '@/components/registrar/add-student-schema';
+import { formatStudentName } from '@/api/students';
 
 interface AddStudentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (student: { name: string; id: string }) => void;
+  onSuccess?: (student: { name: string; id: string; studentNumber: string | null }) => void;
 }
 
 export default function AddStudentModal({ isOpen, onClose, onSuccess }: AddStudentModalProps) {
-  const generateId = useCallback(() => {
-    const year = new Date().getFullYear();
-    const num = String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
-    return `STU-${year}-${num}`;
-  }, []);
-
-  const [studentId] = useState<string>(() => generateId());
-
   if (!isOpen) return null;
-
-  const handleSubmit = (data: AddStudentFormData) => {
-    const fullName = `${data.firstName.trim()} ${data.lastName.trim()}`;
-    if (onSuccess) {
-      onSuccess({ name: fullName, id: studentId });
-    }
-    onClose();
-  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -60,7 +44,18 @@ export default function AddStudentModal({ isOpen, onClose, onSuccess }: AddStude
             </svg>
           </button>
         </div>
-        <StudentForm onSubmit={handleSubmit} onCancel={onClose} studentId={studentId} />
+        <StudentForm
+          onCancel={onClose}
+          onSuccess={(result) => {
+            if (onSuccess) {
+              onSuccess({
+                name: formatStudentName(result.student),
+                id: result.student.id,
+                studentNumber: result.student.studentNumber,
+              });
+            }
+          }}
+        />
       </div>
     </div>
   );

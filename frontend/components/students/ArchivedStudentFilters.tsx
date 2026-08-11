@@ -43,19 +43,18 @@ export default function ArchivedStudentFilters({
           </div>
         </div>
 
-        {/* Archive Reason Filter */}
+        {/* Gender Filter */}
         <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Archive Reason</label>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Gender</label>
           <select
-            value={filters.reason}
-            onChange={(e) => handleChange('reason', e.target.value)}
+            value={filters.gender}
+            onChange={(e) => handleChange('gender', e.target.value)}
             className="w-full py-2.5 px-4 bg-slate-800 border border-slate-600 rounded-xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent focus:bg-slate-700 transition duration-200"
           >
-            <option value="">All Reasons</option>
-            <option value="graduated">Graduated</option>
-            <option value="transferred">Transferred</option>
-            <option value="withdrawn">Withdrawn</option>
-            <option value="deleted">Deleted</option>
+            <option value="">All Genders</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="undisclosed">Prefer not to disclose</option>
           </select>
         </div>
 
