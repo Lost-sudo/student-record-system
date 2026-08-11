@@ -191,6 +191,7 @@ describe("StudentService", () => {
         skip: 0,
         take: 20,
         orderBy: { createdAt: "desc" },
+        include: { contactInfo: true },
       });
       expect(result).toMatchObject({
         data: [mockStudent],
@@ -222,6 +223,7 @@ describe("StudentService", () => {
         skip: 10,
         take: 10,
         orderBy: { createdAt: "desc" },
+        include: { contactInfo: true },
       });
       expect(result.totalPages).toBe(3); // Math.ceil(25 / 10) = 3
     });
@@ -237,6 +239,7 @@ describe("StudentService", () => {
         skip: 0,
         take: 20,
         orderBy: { createdAt: "desc" },
+        include: { contactInfo: true },
       });
       expect(result.page).toBe(1);
     });

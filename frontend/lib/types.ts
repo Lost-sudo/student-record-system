@@ -39,22 +39,19 @@ export interface Student {
     avatar: string;
 }
 
-export type ArchiveReason = 'graduated' | 'transferred' | 'withdrawn' | 'deleted';
-
 export interface ArchivedStudent {
     id: string;
     name: string;
     email: string;
     program: string;
     avatar: string;
-    reason: ArchiveReason;
-    archivedDate: string;
-    archivedBy: string;
+    gender: string;
+    archivedAt: string;
 }
 
 export interface ArchivedFilterState {
     search: string;
-    reason: string;
+    gender: string;
     program: string;
 }
 

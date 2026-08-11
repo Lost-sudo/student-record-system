@@ -56,16 +56,16 @@ export const studentsData: Student[] = [
 ];
 
 export const archivedStudentsData: ArchivedStudent[] = [
-  { id: 'STU-2024-0005', name: 'Bob Johnson', email: 'bob.johnson@srs.edu', program: 'Engineering', reason: 'graduated', archivedDate: '2025-07-31', archivedBy: 'Registrar', avatar: 'BJ' },
-  { id: 'STU-2023-0089', name: 'Maria Santos', email: 'maria.santos@srs.edu', program: 'Business Administration', reason: 'transferred', archivedDate: '2025-07-28', archivedBy: 'Admin', avatar: 'MS' },
-  { id: 'STU-2024-0012', name: 'James Chen', email: 'james.chen@srs.edu', program: 'Computer Science', reason: 'withdrawn', archivedDate: '2025-07-25', archivedBy: 'Registrar', avatar: 'JC' },
-  { id: 'STU-2023-0045', name: 'Aisha Mohammed', email: 'aisha.mohammed@srs.edu', program: 'Medicine', reason: 'graduated', archivedDate: '2025-07-20', archivedBy: 'Admin', avatar: 'AM' },
-  { id: 'STU-2024-0023', name: 'Thomas Anderson', email: 'thomas.anderson@srs.edu', program: 'Arts', reason: 'deleted', archivedDate: '2025-07-18', archivedBy: 'Registrar', avatar: 'TA' },
-  { id: 'STU-2023-0067', name: 'Yuki Tanaka', email: 'yuki.tanaka@srs.edu', program: 'Engineering', reason: 'transferred', archivedDate: '2025-07-15', archivedBy: 'Admin', avatar: 'YT' },
-  { id: 'STU-2024-0034', name: 'Olivia Brown', email: 'olivia.brown@srs.edu', program: 'Business Administration', reason: 'graduated', archivedDate: '2025-07-12', archivedBy: 'Registrar', avatar: 'OB' },
-  { id: 'STU-2023-0078', name: 'Raj Kapoor', email: 'raj.kapoor@srs.edu', program: 'Computer Science', reason: 'withdrawn', archivedDate: '2025-07-10', archivedBy: 'Admin', avatar: 'RK' },
-  { id: 'STU-2024-0045', name: 'Sophie Martin', email: 'sophie.martin@srs.edu', program: 'Medicine', reason: 'graduated', archivedDate: '2025-07-08', archivedBy: 'Registrar', avatar: 'SM' },
-  { id: 'STU-2023-0091', name: 'Daniel Kim', email: 'daniel.kim@srs.edu', program: 'Arts', reason: 'transferred', archivedDate: '2025-07-05', archivedBy: 'Admin', avatar: 'DK' },
-  { id: 'STU-2024-0056', name: 'Isabella Rossi', email: 'isabella.rossi@srs.edu', program: 'Engineering', reason: 'withdrawn', archivedDate: '2025-07-03', archivedBy: 'Registrar', avatar: 'IR' },
-  { id: 'STU-2023-0102', name: 'Michael O\'Brien', email: 'michael.obrien@srs.edu', program: 'Business Administration', reason: 'deleted', archivedDate: '2025-07-01', archivedBy: 'Admin', avatar: 'MO' },
+  { id: 'STU-2024-0005', name: 'Bob Johnson', email: 'bob.johnson@srs.edu', program: 'Engineering', gender: 'male', archivedAt: '2025-07-31', avatar: 'BJ' },
+  { id: 'STU-2023-0089', name: 'Maria Santos', email: 'maria.santos@srs.edu', program: 'Business Administration', gender: 'female', archivedAt: '2025-07-28', avatar: 'MS' },
+  { id: 'STU-2024-0012', name: 'James Chen', email: 'james.chen@srs.edu', program: 'Computer Science', gender: 'male', archivedAt: '2025-07-25', avatar: 'JC' },
+  { id: 'STU-2023-0045', name: 'Aisha Mohammed', email: 'aisha.mohammed@srs.edu', program: 'Medicine', gender: 'female', archivedAt: '2025-07-20', avatar: 'AM' },
+  { id: 'STU-2024-0023', name: 'Thomas Anderson', email: 'thomas.anderson@srs.edu', program: 'Arts', gender: 'male', archivedAt: '2025-07-18', avatar: 'TA' },
+  { id: 'STU-2023-0067', name: 'Yuki Tanaka', email: 'yuki.tanaka@srs.edu', program: 'Engineering', gender: 'male', archivedAt: '2025-07-15', avatar: 'YT' },
+  { id: 'STU-2024-0034', name: 'Olivia Brown', email: 'olivia.brown@srs.edu', program: 'Business Administration', gender: 'female', archivedAt: '2025-07-12', avatar: 'OB' },
+  { id: 'STU-2023-0078', name: 'Raj Kapoor', email: 'raj.kapoor@srs.edu', program: 'Computer Science', gender: 'male', archivedAt: '2025-07-10', avatar: 'RK' },
+  { id: 'STU-2024-0045', name: 'Sophie Martin', email: 'sophie.martin@srs.edu', program: 'Medicine', gender: 'female', archivedAt: '2025-07-08', avatar: 'SM' },
+  { id: 'STU-2023-0091', name: 'Daniel Kim', email: 'daniel.kim@srs.edu', program: 'Arts', gender: 'male', archivedAt: '2025-07-05', avatar: 'DK' },
+  { id: 'STU-2024-0056', name: 'Isabella Rossi', email: 'isabella.rossi@srs.edu', program: 'Engineering', gender: 'female', archivedAt: '2025-07-03', avatar: 'IR' },
+  { id: 'STU-2023-0102', name: 'Michael O\'Brien', email: 'michael.obrien@srs.edu', program: 'Business Administration', gender: 'male', archivedAt: '2025-07-01', avatar: 'MO' },
 ];
