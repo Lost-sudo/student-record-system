@@ -90,14 +90,6 @@ input:-webkit-autofill:focus {
   max-height: 200px; 
 }
 
-.rotate-90 { 
-  transform: rotate(90deg); 
-}
-
-.transition-rotate { 
-  transition: transform 0.3s ease; 
-}
-
 input:-webkit-autofill { 
   -webkit-box-shadow: 0 0 0px 1000px #1e293b inset; 
   -webkit-text-fill-color: #e2e8f0; 

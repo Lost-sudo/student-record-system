@@ -31,6 +31,7 @@ export const navItems: NavItem[] = [
     icon: <CalendarDays className="w-5 h-5 text-emerald-400" />,
     submenu: [
       { label: 'Academic Terms', href: '/academic-terms' },
+      { label: 'Courses', href: '/courses' },
     ]
   },
   { label: 'Reports & Analytics', href: '#', icon: <BarChart3 className="w-5 h-5 text-purple-400" /> },
