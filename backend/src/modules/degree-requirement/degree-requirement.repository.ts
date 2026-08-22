@@ -2,12 +2,12 @@ import {
   DegreeRequirement,
   Prisma,
   PrismaClient,
-} from "../../generated/prisma/client";
+} from "../../generated/prisma/client.js";
 import {
   CreateDegreeRequirementInput,
   DegreeRequirementQueryInput,
   UpdateDegreeRequirementInput,
-} from "./degree-requirement.types";
+} from "./degree-requirement.types.js";
 
 export class DegreeRequirementRepository {
   constructor(private readonly prisma: PrismaClient) {}

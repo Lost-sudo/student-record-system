@@ -1,9 +1,9 @@
-import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils";
-import { CourseRepository } from "./course.repository";
-import { CourseService } from "./course.service";
-import { CreateCourseInput, UpdateCourseInput } from "./course.types";
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils.js";
+import { CourseRepository } from "./course.repository.js";
+import { CourseService } from "./course.service.js";
+import { CreateCourseInput, UpdateCourseInput } from "./course.types.js";
 
-jest.mock("../../../utils/prisma-error.utils", () => ({
+jest.mock("../../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
   isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",

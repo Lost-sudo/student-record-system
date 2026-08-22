@@ -2,13 +2,15 @@ import compression from "compression";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-import pinoHttp from "pino-http";
+import pinoHttpModule from "pino-http";
 import cookieParser from "cookie-parser";
 
-import { logger } from "./config/logger";
+import { logger } from "./config/logger.js";
 
-import routes from "./routes";
-import { errorHandler } from "./middlewares/error.middleware";
+import routes from "./routes/index.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
+
+const pinoHttp = pinoHttpModule as unknown as typeof pinoHttpModule.default;
 
 const app = express();
 
@@ -29,10 +31,10 @@ app.use(cookieParser());
 app.use("/api", routes);
 
 app.use((_req, res) => {
-    res.status(404).json({
-        success: false,
-        message: "Resource not found",
-    });
+  res.status(404).json({
+    success: false,
+    message: "Resource not found",
+  });
 });
 
 app.use(errorHandler);

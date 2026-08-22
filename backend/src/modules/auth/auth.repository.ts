@@ -1,5 +1,5 @@
-import { PrismaClient } from "../../generated/prisma/client";
-import { UserRole } from "../../generated/prisma/enums";
+import { PrismaClient } from "../../generated/prisma/client.js";
+import { UserRole } from "../../generated/prisma/enums.js";
 
 export class AuthRepository {
   constructor(private readonly prisma: PrismaClient) {}

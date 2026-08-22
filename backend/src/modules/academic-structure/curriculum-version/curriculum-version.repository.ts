@@ -2,12 +2,12 @@ import {
   CurriculumVersion,
   Prisma,
   PrismaClient,
-} from "../../../generated/prisma/client";
+} from "../../../generated/prisma/client.js";
 import {
   CreateCurriculumVersionInput,
   CurriculumVersionQueryInput,
   UpdateCurriculumVersionInput,
-} from "./curriculum-version.validator";
+} from "./curriculum-version.validator.js";
 
 export class CurriculumVersionRepository {
   constructor(private readonly prisma: PrismaClient) {}

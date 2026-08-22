@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uuidSchema } from "../../utils/zod";
+import { uuidSchema } from "../../utils/zod.js";
 
 const nameSchema = z.string().trim().min(2).max(100);
 

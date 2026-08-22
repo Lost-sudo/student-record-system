@@ -1,9 +1,9 @@
-import { CourseSection as PrismaCourseSection } from "../../../generated/prisma/client";
+import { CourseSection as PrismaCourseSection } from "../../../generated/prisma/client.js";
 import {
   CourseSectionQueryInput,
   CreateCourseSectionInput,
   UpdateCourseSectionInput,
-} from "./course-section.validator";
+} from "./course-section.validator.js";
 
 export type CourseSectionDto = {
   id: PrismaCourseSection["id"];

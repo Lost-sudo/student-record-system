@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { prisma } from "../../database/prisma";
-import { authenticate, authorize } from "../../middlewares/auth.middleware";
-import { validate } from "../../middlewares/validate.middleware";
-import { EmergencyContactController } from "./emergency-contact.controller";
-import { EmergencyContactRepository } from "./emergency-contact.repository";
-import { EmergencyContactService } from "./emergency-contact.service";
-import { createEmergencyContactSchema, updateEmergencyContactSchema } from "./emergency-contact.validator";
+import { prisma } from "../../database/prisma.js";
+import { authenticate, authorize } from "../../middlewares/auth.middleware.js";
+import { validate } from "../../middlewares/validate.middleware.js";
+import { EmergencyContactController } from "./emergency-contact.controller.js";
+import { EmergencyContactRepository } from "./emergency-contact.repository.js";
+import { EmergencyContactService } from "./emergency-contact.service.js";
+import { createEmergencyContactSchema, updateEmergencyContactSchema } from "./emergency-contact.validator.js";
 
 const repository = new EmergencyContactRepository(prisma);
 const service = new EmergencyContactService(repository);

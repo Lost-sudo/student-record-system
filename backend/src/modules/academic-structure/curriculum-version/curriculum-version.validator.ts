@@ -1,5 +1,5 @@
 import z from "zod";
-import { booleanQuerySchema } from "../../../utils/zod";
+import { booleanQuerySchema } from "../../../utils/zod.js";
 
 export const createCurriculumVersionSchema = z.object({
   programId: z.string().uuid(),

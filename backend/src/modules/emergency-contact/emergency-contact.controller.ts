@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { studentIdParamsSchema, uuidParamsSchema } from "../../utils/zod";
-import { EmergencyContactService } from "./emergency-contact.service";
-import { createEmergencyContactSchema, updateEmergencyContactSchema } from "./emergency-contact.validator";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { studentIdParamsSchema, uuidParamsSchema } from "../../utils/zod.js";
+import { EmergencyContactService } from "./emergency-contact.service.js";
+import { createEmergencyContactSchema, updateEmergencyContactSchema } from "./emergency-contact.validator.js";
 
 export class EmergencyContactController {
   constructor(private readonly service: EmergencyContactService) {}

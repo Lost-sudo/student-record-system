@@ -1,20 +1,20 @@
-import { CoursePrerequisite } from "../../../generated/prisma/client";
+import { CoursePrerequisite } from "../../../generated/prisma/client.js";
 import {
   AppError,
   BadRequestError,
   ConflictError,
   InternalServerError,
   NotFoundError,
-} from "../../../utils/error.utils";
-import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination";
-import { isUniqueConstraintViolation } from "../../../utils/prisma-error.utils";
-import { CourseRepository } from "../course/course.repository";
-import { CoursePrerequisiteRepository } from "./course-prerequisite.repository";
+} from "../../../utils/error.utils.js";
+import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination.js";
+import { isUniqueConstraintViolation } from "../../../utils/prisma-error.utils.js";
+import { CourseRepository } from "../course/course.repository.js";
+import { CoursePrerequisiteRepository } from "./course-prerequisite.repository.js";
 import {
   CoursePrerequisiteDto,
   CoursePrerequisiteQueryInput,
-} from "./course-prerequisite.types";
-import { CreateCoursePrerequisiteInput } from "./course-prerequisite.validator";
+} from "./course-prerequisite.types.js";
+import { CreateCoursePrerequisiteInput } from "./course-prerequisite.validator.js";
 
 export class CoursePrerequisiteService {
   constructor(

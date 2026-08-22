@@ -1,16 +1,16 @@
-import { prisma } from "../../../database/prisma";
+import { prisma } from "../../../database/prisma.js";
 import {
   BadRequestError,
   ConflictError,
   InternalServerError,
   NotFoundError,
-} from "../../../utils/error.utils";
-import { AcademicTermRepository } from "../academic-term/academic-term.repository";
-import { CourseRepository } from "../course/course.repository";
-import { CourseSectionRepository } from "./course-section.repository";
-import { CourseSectionService } from "./course-section.service";
+} from "../../../utils/error.utils.js";
+import { AcademicTermRepository } from "../academic-term/academic-term.repository.js";
+import { CourseRepository } from "../course/course.repository.js";
+import { CourseSectionRepository } from "./course-section.repository.js";
+import { CourseSectionService } from "./course-section.service.js";
 
-jest.mock("../../../utils/prisma-error.utils", () => ({
+jest.mock("../../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) =>
     typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) =>
@@ -21,7 +21,7 @@ jest.mock("../../../utils/prisma-error.utils", () => ({
     (error as { code?: string } | null)?.code === "P2025",
 }));
 
-jest.mock("../../../database/prisma", () => ({
+jest.mock("../../../database/prisma.js", () => ({
   prisma: {
     courseSection: {
       create: jest.fn(),

@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { CourseSectionRepository } from "./course-section.repository";
-import { prisma } from "../../../database/prisma";
-import { CourseRepository } from "../course/course.repository";
-import { AcademicTermRepository } from "../academic-term/academic-term.repository";
-import { CourseSectionService } from "./course-section.service";
-import { CourseSectionController } from "./course-section.controller";
+import { CourseSectionRepository } from "./course-section.repository.js";
+import { prisma } from "../../../database/prisma.js";
+import { CourseRepository } from "../course/course.repository.js";
+import { AcademicTermRepository } from "../academic-term/academic-term.repository.js";
+import { CourseSectionService } from "./course-section.service.js";
+import { CourseSectionController } from "./course-section.controller.js";
 
 const router = Router();
 

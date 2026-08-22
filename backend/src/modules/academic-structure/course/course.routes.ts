@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { CourseRepository } from "./course.repository";
-import { prisma } from "../../../database/prisma";
-import { CourseService } from "./course.service";
-import { CourseController } from "./course.controller";
+import { CourseRepository } from "./course.repository.js";
+import { prisma } from "../../../database/prisma.js";
+import { CourseService } from "./course.service.js";
+import { CourseController } from "./course.controller.js";
 
 const router = Router();
 

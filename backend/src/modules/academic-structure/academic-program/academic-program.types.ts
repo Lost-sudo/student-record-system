@@ -1,5 +1,5 @@
-import { AcademicProgram as PrismaAcademicProgram } from '../../../generated/prisma/client';
-import { AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator';
+import { AcademicProgram as PrismaAcademicProgram } from '../../../generated/prisma/client.js';
+import { AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator.js';
 
 export type AcademicProgramDto = {
     id: PrismaAcademicProgram['id'];

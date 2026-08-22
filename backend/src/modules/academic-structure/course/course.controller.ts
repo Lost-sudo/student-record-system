@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../../utils/asyncHandler";
-import { CourseService } from "./course.service";
-import { courseQuerySchema, createCourseSchema, updateCourseSchema } from "./course.validator";
-import { uuidParamsSchema } from "../../../utils/zod";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { CourseService } from "./course.service.js";
+import { courseQuerySchema, createCourseSchema, updateCourseSchema } from "./course.validator.js";
+import { uuidParamsSchema } from "../../../utils/zod.js";
 
 export class CourseController {
     constructor(private readonly courseService: CourseService) {}

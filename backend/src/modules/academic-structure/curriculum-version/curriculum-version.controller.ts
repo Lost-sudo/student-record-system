@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../../utils/asyncHandler";
-import { CurriculumVersionService } from "./curriculum-version.service";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { CurriculumVersionService } from "./curriculum-version.service.js";
 import {
   createCurriculumVersionSchema,
   curriculumVersionQuerySchema,
   updateCurriculumVersionSchema,
-} from "./curriculum-version.validator";
-import { uuidParamsSchema } from "../../../utils/zod";
+} from "./curriculum-version.validator.js";
+import { uuidParamsSchema } from "../../../utils/zod.js";
 
 export class CurriculumVersionController {
   constructor(

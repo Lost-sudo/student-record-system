@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { prisma } from '../../database/prisma';
-import { StudentController } from './student.controller';
-import { StudentService } from './student.service';
-import { StudentRepository } from './student.repository';
-import { authenticate, authorize } from '../../middlewares/auth.middleware';
+import { prisma } from '../../database/prisma.js';
+import { StudentController } from './student.controller.js';
+import { StudentService } from './student.service.js';
+import { StudentRepository } from './student.repository.js';
+import { authenticate, authorize } from '../../middlewares/auth.middleware.js';
 
 const repository = new StudentRepository(prisma);
 const service = new StudentService(repository);

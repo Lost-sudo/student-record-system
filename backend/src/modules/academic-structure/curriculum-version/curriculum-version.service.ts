@@ -1,24 +1,24 @@
-import { CurriculumVersion } from "../../../generated/prisma/client";
+import { CurriculumVersion } from "../../../generated/prisma/client.js";
 import {
   AppError,
   ConflictError,
   InternalServerError,
   NotFoundError,
-} from "../../../utils/error.utils";
-import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination";
+} from "../../../utils/error.utils.js";
+import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination.js";
 import {
   isForeignKeyConstraintViolation,
   isUniqueConstraintViolation,
-} from "../../../utils/prisma-error.utils";
-import { AcademicProgramRepository } from "../academic-program/academic-program.repository";
-import { AcademicTermRepository } from "../academic-term/academic-term.repository";
-import { CurriculumVersionRepository } from "./curriculum-version.repository";
-import { CurriculumVersionDto } from "./curriculum-version.types";
+} from "../../../utils/prisma-error.utils.js";
+import { AcademicProgramRepository } from "../academic-program/academic-program.repository.js";
+import { AcademicTermRepository } from "../academic-term/academic-term.repository.js";
+import { CurriculumVersionRepository } from "./curriculum-version.repository.js";
+import { CurriculumVersionDto } from "./curriculum-version.types.js";
 import {
   CreateCurriculumVersionInput,
   CurriculumVersionQueryInput,
   UpdateCurriculumVersionInput,
-} from "./curriculum-version.validator";
+} from "./curriculum-version.validator.js";
 
 export class CurriculumVersionService {
   constructor(

@@ -1,9 +1,9 @@
-import { AcademicTerm } from '../../../generated/prisma/client';
-import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils';
-import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from '../../../utils/prisma-error.utils';
-import { PaginationMeta, buildPaginationMeta } from '../../../utils/pagination';
-import { AcademicTermRepository } from "./academic-term.repository"
-import { AcademicTermDto, AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types";
+import { AcademicTerm } from '../../../generated/prisma/client.js';
+import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils.js';
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from '../../../utils/prisma-error.utils.js';
+import { PaginationMeta, buildPaginationMeta } from '../../../utils/pagination.js';
+import { AcademicTermRepository } from "./academic-term.repository.js"
+import { AcademicTermDto, AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types.js";
 
 export class AcademicTermService {
     constructor(private readonly academicTermRepository: AcademicTermRepository) { }

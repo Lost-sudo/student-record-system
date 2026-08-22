@@ -1,5 +1,5 @@
-import { Prisma } from "../../generated/prisma/client";
-import { CreateEmergencyContactInput, UpdateEmergencyContactInput } from "./emergency-contact.validator";
+import { Prisma } from "../../generated/prisma/client.js";
+import { CreateEmergencyContactInput, UpdateEmergencyContactInput } from "./emergency-contact.validator.js";
 
 export type EmergencyContactDto = Prisma.EmergencyContactGetPayload<{}>;
 

@@ -1,7 +1,7 @@
-import { AppError, InternalServerError, NotFoundError } from "../../utils/error.utils";
-import { isForeignKeyConstraintViolation, isPrismaRecordNotFound } from "../../utils/prisma-error.utils";
-import { CreateStudentEmergencyContact, UpdateStudentEmergencyContact } from "./emergency-contact.types";
-import { EmergencyContactRepository } from "./emergency-contact.repository";
+import { AppError, InternalServerError, NotFoundError } from "../../utils/error.utils.js";
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound } from "../../utils/prisma-error.utils.js";
+import { CreateStudentEmergencyContact, UpdateStudentEmergencyContact } from "./emergency-contact.types.js";
+import { EmergencyContactRepository } from "./emergency-contact.repository.js";
 
 export class EmergencyContactService {
   constructor(private readonly emergencyContactRepository: EmergencyContactRepository) {}

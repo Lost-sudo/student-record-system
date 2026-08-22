@@ -2,12 +2,12 @@ import {
   CourseSection,
   Prisma,
   PrismaClient,
-} from "../../../generated/prisma/client";
+} from "../../../generated/prisma/client.js";
 import {
   CourseSectionQueryInput,
   CreateCourseSectionInput,
   UpdateCourseSectionInput,
-} from "./course-section.validator";
+} from "./course-section.validator.js";
 
 export class CourseSectionRepository {
   constructor(private readonly prisma: PrismaClient) {}

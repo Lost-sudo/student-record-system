@@ -1,5 +1,5 @@
-import { AcademicTerm, Prisma, PrismaClient } from "../../../generated/prisma/client";
-import { AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types";
+import { AcademicTerm, Prisma, PrismaClient } from "../../../generated/prisma/client.js";
+import { AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types.js";
 
 export class AcademicTermRepository {
     constructor(private readonly prisma: PrismaClient) { }

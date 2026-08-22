@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { AcademicTermRepository } from "./academic-term.repository";
-import { prisma } from "../../../database/prisma";
-import { AcademicTermService } from "./academic-term.service";
-import { AcademicTermController } from "./academic-term.controller";
+import { AcademicTermRepository } from "./academic-term.repository.js";
+import { prisma } from "../../../database/prisma.js";
+import { AcademicTermService } from "./academic-term.service.js";
+import { AcademicTermController } from "./academic-term.controller.js";
 
 const router = Router();
 

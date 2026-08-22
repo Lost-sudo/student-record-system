@@ -1,5 +1,5 @@
 import { date, z } from "zod";
-import { booleanQuerySchema } from '../../../utils/zod';
+import { booleanQuerySchema } from '../../../utils/zod.js';
 
 export const createAcademicTermSchema = z.object({
     termCode: z.string().trim().toUpperCase().min(2).max(20).regex(/^[A-Z0-9-]+$/, {

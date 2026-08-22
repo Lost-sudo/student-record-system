@@ -1,9 +1,9 @@
-import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils";
-import { AcademicTermRepository } from "./academic-term.repository";
-import { AcademicTermService } from "./academic-term.service";
-import { CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types";
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils.js";
+import { AcademicTermRepository } from "./academic-term.repository.js";
+import { AcademicTermService } from "./academic-term.service.js";
+import { CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.types.js";
 
-jest.mock("../../../utils/prisma-error.utils", () => ({
+jest.mock("../../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
   isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",

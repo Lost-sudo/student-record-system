@@ -1,9 +1,9 @@
-import { CurriculumVersion as PrismaCurriculumVersion } from "../../../generated/prisma/client";
+import { CurriculumVersion as PrismaCurriculumVersion } from "../../../generated/prisma/client.js";
 import {
   CreateCurriculumVersionInput,
   UpdateCurriculumVersionInput,
   CurriculumVersionQueryInput,
-} from "./curriculum-version.validator";
+} from "./curriculum-version.validator.js";
 
 export type CurriculumVersionDto = {
   id: PrismaCurriculumVersion["id"];

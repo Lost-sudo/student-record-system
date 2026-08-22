@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { AuthService } from "./auth.service";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { env } from "../../config/env";
+import { AuthService } from "./auth.service.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { env } from "../../config/env.js";
 
 const setRefreshTokenCookie = (res: Response, token: string, maxAgeInSeconds: number) => {
   res.cookie('refreshToken', token, {

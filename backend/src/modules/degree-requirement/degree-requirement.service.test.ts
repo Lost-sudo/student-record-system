@@ -1,10 +1,10 @@
-import { ConflictError, NotFoundError } from "../../utils/error.utils";
-import { CourseRepository } from "../academic-structure/course/course.repository";
-import { CurriculumVersionRepository } from "../academic-structure/curriculum-version/curriculum-version.repository";
-import { DegreeRequirementRepository } from "./degree-requirement.repository";
-import { DegreeRequirementService } from "./degree-requirement.service";
+import { ConflictError, NotFoundError } from "../../utils/error.utils.js";
+import { CourseRepository } from "../academic-structure/course/course.repository.js";
+import { CurriculumVersionRepository } from "../academic-structure/curriculum-version/curriculum-version.repository.js";
+import { DegreeRequirementRepository } from "./degree-requirement.repository.js";
+import { DegreeRequirementService } from "./degree-requirement.service.js";
 
-jest.mock("../../utils/prisma-error.utils", () => ({
+jest.mock("../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) =>
     typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) =>

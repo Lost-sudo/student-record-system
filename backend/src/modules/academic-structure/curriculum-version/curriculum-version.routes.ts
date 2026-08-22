@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { CurriculumVersionRepository } from "./curriculum-version.repository";
-import { prisma } from "../../../database/prisma";
-import { AcademicTermRepository } from "../academic-term/academic-term.repository";
-import { AcademicProgramRepository } from "../academic-program/academic-program.repository";
-import { CurriculumVersionService } from "./curriculum-version.service";
-import { CurriculumVersionController } from "./curriculum-version.controller";
+import { CurriculumVersionRepository } from "./curriculum-version.repository.js";
+import { prisma } from "../../../database/prisma.js";
+import { AcademicTermRepository } from "../academic-term/academic-term.repository.js";
+import { AcademicProgramRepository } from "../academic-program/academic-program.repository.js";
+import { CurriculumVersionService } from "./curriculum-version.service.js";
+import { CurriculumVersionController } from "./curriculum-version.controller.js";
 
 const router = Router();
 

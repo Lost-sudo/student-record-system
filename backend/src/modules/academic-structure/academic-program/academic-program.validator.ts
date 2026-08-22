@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { booleanQuerySchema } from "../../../utils/zod";
+import { booleanQuerySchema } from "../../../utils/zod.js";
 
 export const DEGREE_TYPES = [
     'CERTIFICATE',

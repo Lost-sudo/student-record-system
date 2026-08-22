@@ -1,10 +1,10 @@
-import { Student } from "../../generated/prisma/client";
-import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils";
-import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils";
-import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination";
-import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator";
-import { StudentDto } from "./student.types";
-import { StudentRepository } from "./student.repository";
+import { Student } from "../../generated/prisma/client.js";
+import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils.js";
+import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils.js";
+import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination.js";
+import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator.js";
+import { StudentDto } from "./student.types.js";
+import { StudentRepository } from "./student.repository.js";
 
 export class StudentService {
   constructor(private readonly studentRepository: StudentRepository) {}

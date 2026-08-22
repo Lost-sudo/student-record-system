@@ -1,5 +1,5 @@
-import { AcademicTerm as PrismaAcademicTerm } from '../../../generated/prisma/client';
-import type { AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.validator";
+import { AcademicTerm as PrismaAcademicTerm } from '../../../generated/prisma/client.js';
+import type { AcademicTermQueryInput, CreateAcademicTermInput, UpdateAcademicTermInput } from "./academic-term.validator.js";
 
 export type AcademicTermDto = {
     id: PrismaAcademicTerm['id'];

@@ -1,9 +1,9 @@
-import { DegreeRequirement as PrismaDegreeRequirement } from "../../generated/prisma/client";
+import { DegreeRequirement as PrismaDegreeRequirement } from "../../generated/prisma/client.js";
 import {
   CreateDegreeRequirementInput,
   UpdateDegreeRequirementInput,
   DegreeRequirementQueryInput,
-} from "./degree-requirement.validator";
+} from "./degree-requirement.validator.js";
 
 export type DegreeRequirementDto = {
   id: PrismaDegreeRequirement["id"];

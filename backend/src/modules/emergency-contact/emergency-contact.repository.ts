@@ -1,5 +1,5 @@
-import { PrismaClient, EmergencyContact } from "../../generated/prisma/client";
-import { CreateStudentEmergencyContact, UpdateStudentEmergencyContact } from "./emergency-contact.types";
+import { PrismaClient, EmergencyContact } from "../../generated/prisma/client.js";
+import { CreateStudentEmergencyContact, UpdateStudentEmergencyContact } from "./emergency-contact.types.js";
 
 export class EmergencyContactRepository {
   constructor(private readonly prisma: PrismaClient) {}
