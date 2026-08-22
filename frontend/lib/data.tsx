@@ -32,6 +32,7 @@ export const navItems: NavItem[] = [
     submenu: [
       { label: 'Academic Terms', href: '/academic-terms' },
       { label: 'Courses', href: '/courses' },
+      { label: 'Course Sections', href: '/sections' },
     ]
   },
   { label: 'Reports & Analytics', href: '#', icon: <BarChart3 className="w-5 h-5 text-purple-400" /> },
