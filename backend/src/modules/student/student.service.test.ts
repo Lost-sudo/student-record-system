@@ -1,16 +1,16 @@
-import { StudentService } from "./student.service";
-import { StudentRepository } from "./student.repository";
-import { prisma } from "../../database/prisma";
-import { BadRequestError, ConflictError, NotFoundError } from "../../utils/error.utils";
+import { StudentService } from "./student.service.js";
+import { StudentRepository } from "./student.repository.js";
+import { prisma } from "../../database/prisma.js";
+import { BadRequestError, ConflictError, NotFoundError } from "../../utils/error.utils.js";
 
-jest.mock("../../utils/prisma-error.utils", () => ({
+jest.mock("../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
   isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
   isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
 }));
 
-jest.mock("../../database/prisma", () => ({
+jest.mock("../../database/prisma.js", () => ({
   prisma: {
     student: {
       findFirst: jest.fn(),

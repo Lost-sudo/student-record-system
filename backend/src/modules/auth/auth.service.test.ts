@@ -1,12 +1,12 @@
-import { authService } from "./auth.service";
-import { prisma } from "../../database/prisma";
-import { hashPassword, comparePassword } from "../../utils/password.utils";
-import { generateTokenPair, verifyRefreshToken } from "../../utils/jwt.utils";
-import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "../../utils/error.utils";
-import { UserRole } from "../../generated/prisma/enums";
+import { authService } from "./auth.service.js";
+import { prisma } from "../../database/prisma.js";
+import { hashPassword, comparePassword } from "../../utils/password.utils.js";
+import { generateTokenPair, verifyRefreshToken } from "../../utils/jwt.utils.js";
+import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "../../utils/error.utils.js";
+import { UserRole } from "../../generated/prisma/enums.js";
 import { email } from "zod";
 
-jest.mock("../../utils/prisma-error.utils", () => ({
+jest.mock("../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
   isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
@@ -14,7 +14,7 @@ jest.mock("../../utils/prisma-error.utils", () => ({
 }));
 
 // Mocks
-jest.mock("../../database/prisma", () => ({
+jest.mock("../../database/prisma.js", () => ({
   prisma: {
     user: {
       findFirst: jest.fn(),
@@ -31,8 +31,8 @@ jest.mock("../../database/prisma", () => ({
   },
 }));
 
-jest.mock('../../utils/password.utils');
-jest.mock('../../utils/jwt.utils');
+jest.mock('../../utils/password.utils.js');
+jest.mock('../../utils/jwt.utils.js');
 
 const mockPrisma = prisma as unknown as {
     user: {

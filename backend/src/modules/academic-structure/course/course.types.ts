@@ -1,5 +1,5 @@
-import { Course as PrismaCourse } from "../../../generated/prisma/client";
-import { CourseQueryInput, CreateCourseInput, UpdateCourseInput } from './course.validator';
+import { Course as PrismaCourse } from "../../../generated/prisma/client.js";
+import { CourseQueryInput, CreateCourseInput, UpdateCourseInput } from './course.validator.js';
 
 export type CourseDto = {
     id: PrismaCourse['id'];

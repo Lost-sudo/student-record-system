@@ -1,9 +1,9 @@
-import { AcademicProgramService } from './academic-program.service';
-import { AcademicProgramRepository } from './academic-program.repository';
-import { ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils';
-import { CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator';
+import { AcademicProgramService } from './academic-program.service.js';
+import { AcademicProgramRepository } from './academic-program.repository.js';
+import { ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils.js';
+import { CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator.js';
 
-jest.mock("../../../utils/prisma-error.utils", () => ({
+jest.mock("../../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
   isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",

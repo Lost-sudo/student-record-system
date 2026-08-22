@@ -1,7 +1,7 @@
-import { AppError, ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils";
-import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils";
-import { ContactRepository } from "./contact.repository";
-import { CreateContactInfo, UpdateContactInfo } from "./contact.types";
+import { AppError, ConflictError, InternalServerError, NotFoundError } from "../../utils/error.utils.js";
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils.js";
+import { ContactRepository } from "./contact.repository.js";
+import { CreateContactInfo, UpdateContactInfo } from "./contact.types.js";
 
 export class ContactService {
   constructor(private readonly contactRepository: ContactRepository) {}

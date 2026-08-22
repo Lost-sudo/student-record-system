@@ -1,5 +1,5 @@
-import { Student as PrismaStudent } from "../../generated/prisma/client";
-import { StudentQueryInput, CreateStudentInput, UpdateStudentInput } from "./student.validator";
+import { Student as PrismaStudent } from "../../generated/prisma/client.js";
+import { StudentQueryInput, CreateStudentInput, UpdateStudentInput } from "./student.validator.js";
 
 export type StudentDto = {
   id: PrismaStudent["id"];

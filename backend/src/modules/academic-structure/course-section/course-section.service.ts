@@ -1,25 +1,25 @@
-import { CourseSection } from "../../../generated/prisma/client";
+import { CourseSection } from "../../../generated/prisma/client.js";
 import {
   AppError,
   BadRequestError,
   ConflictError,
   InternalServerError,
   NotFoundError,
-} from "../../../utils/error.utils";
-import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination";
+} from "../../../utils/error.utils.js";
+import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination.js";
 import {
   isForeignKeyConstraintViolation,
   isUniqueConstraintViolation,
-} from "../../../utils/prisma-error.utils";
-import { AcademicTermRepository } from "../academic-term/academic-term.repository";
-import { CourseRepository } from "../course/course.repository";
-import { CourseSectionRepository } from "./course-section.repository";
+} from "../../../utils/prisma-error.utils.js";
+import { AcademicTermRepository } from "../academic-term/academic-term.repository.js";
+import { CourseRepository } from "../course/course.repository.js";
+import { CourseSectionRepository } from "./course-section.repository.js";
 import {
   CourseSectionDto,
   CourseSectionQueryInput,
   CreateCourseSectionInput,
   UpdateCourseSectionInput,
-} from "./course-section.types";
+} from "./course-section.types.js";
 
 export class CourseSectionService {
   constructor(

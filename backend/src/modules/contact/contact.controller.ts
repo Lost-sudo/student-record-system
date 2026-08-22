@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { studentIdParamsSchema, uuidParamsSchema } from "../../utils/zod";
-import { ContactService } from "./contact.service";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { studentIdParamsSchema, uuidParamsSchema } from "../../utils/zod.js";
+import { ContactService } from "./contact.service.js";
 
 export class ContactController {
   constructor(private readonly contactService: ContactService) {}

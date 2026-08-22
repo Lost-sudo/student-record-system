@@ -1,16 +1,16 @@
-import { prisma } from "../../database/prisma";
-import { NotFoundError } from "../../utils/error.utils";
-import { EmergencyContactRepository } from "./emergency-contact.repository";
-import { EmergencyContactService } from "./emergency-contact.service";
+import { prisma } from "../../database/prisma.js";
+import { NotFoundError } from "../../utils/error.utils.js";
+import { EmergencyContactRepository } from "./emergency-contact.repository.js";
+import { EmergencyContactService } from "./emergency-contact.service.js";
 
-jest.mock("../../utils/prisma-error.utils", () => ({
+jest.mock("../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) => typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2002",
   isForeignKeyConstraintViolation: (error: unknown) => (error as { code?: string } | null)?.code === "P2003",
   isPrismaRecordNotFound: (error: unknown) => (error as { code?: string } | null)?.code === "P2025",
 }));
 
-jest.mock("../../database/prisma", () => ({
+jest.mock("../../database/prisma.js", () => ({
   prisma: {
     student: {
       findFirst: jest.fn(),

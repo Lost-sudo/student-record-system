@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { asyncHandler } from '../../../utils/asyncHandler';
-import { AcademicProgramService } from './academic-program.service';
-import { academicProgramQuerySchema, createAcademicProgramSchema, updateAcademicProgramSchema } from './academic-program.validator';
-import { uuidParamsSchema } from '../../../utils/zod';
+import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { AcademicProgramService } from './academic-program.service.js';
+import { academicProgramQuerySchema, createAcademicProgramSchema, updateAcademicProgramSchema } from './academic-program.validator.js';
+import { uuidParamsSchema } from '../../../utils/zod.js';
 import { th } from 'zod/v4/locales/index.js';
 
 export class AcademicProgramController {

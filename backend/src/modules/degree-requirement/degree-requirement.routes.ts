@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { DegreeRequirementRepository } from "./degree-requirement.repository";
-import { prisma } from "../../database/prisma";
-import { CurriculumVersionRepository } from "../academic-structure/curriculum-version/curriculum-version.repository";
-import { CourseRepository } from "../academic-structure/course/course.repository";
-import { DegreeRequirementService } from "./degree-requirement.service";
-import { DegreeRequirementController } from "./degree-requirement.controller";
+import { DegreeRequirementRepository } from "./degree-requirement.repository.js";
+import { prisma } from "../../database/prisma.js";
+import { CurriculumVersionRepository } from "../academic-structure/curriculum-version/curriculum-version.repository.js";
+import { CourseRepository } from "../academic-structure/course/course.repository.js";
+import { DegreeRequirementService } from "./degree-requirement.service.js";
+import { DegreeRequirementController } from "./degree-requirement.controller.js";
 
 const router = Router();
 

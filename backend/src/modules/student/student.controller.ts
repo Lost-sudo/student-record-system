@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { uuidParamsSchema } from "../../utils/zod";
-import { studentQuerySchema, createStudentSchema, updateStudentSchema } from "./student.validator";
-import { StudentService } from "./student.service";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { uuidParamsSchema } from "../../utils/zod.js";
+import { studentQuerySchema, createStudentSchema, updateStudentSchema } from "./student.validator.js";
+import { StudentService } from "./student.service.js";
 
 export class StudentController {
   constructor(private readonly service: StudentService) {}

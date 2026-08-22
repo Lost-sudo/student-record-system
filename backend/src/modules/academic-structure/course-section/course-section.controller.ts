@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../../utils/asyncHandler";
-import { CourseSectionService } from "./course-section.service";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { CourseSectionService } from "./course-section.service.js";
 import {
   courseSectionQuerySchema,
   createCourseSectionSchema,
   updateCourseSectionSchema,
-} from "./course-section.validator";
-import { uuidParamsSchema } from "../../../utils/zod";
+} from "./course-section.validator.js";
+import { uuidParamsSchema } from "../../../utils/zod.js";
 
 export class CourseSectionController {
   constructor(private readonly courseSectionService: CourseSectionService) {}

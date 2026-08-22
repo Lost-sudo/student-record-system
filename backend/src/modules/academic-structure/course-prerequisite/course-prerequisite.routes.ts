@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { CoursePrerequisiteRepository } from "./course-prerequisite.repository";
-import { prisma } from "../../../database/prisma";
-import { CoursePrerequisiteService } from "./course-prerequisite.service";
-import { CourseRepository } from "../course/course.repository";
-import { CoursePrerequisiteController } from "./course-prerequisite.controller";
+import { CoursePrerequisiteRepository } from "./course-prerequisite.repository.js";
+import { prisma } from "../../../database/prisma.js";
+import { CoursePrerequisiteService } from "./course-prerequisite.service.js";
+import { CourseRepository } from "../course/course.repository.js";
+import { CoursePrerequisiteController } from "./course-prerequisite.controller.js";
 
 const router = Router();
 

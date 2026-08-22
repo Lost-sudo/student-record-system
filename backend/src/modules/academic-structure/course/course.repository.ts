@@ -1,6 +1,6 @@
-import { Course, Prisma, PrismaClient } from "../../../generated/prisma/client";
-import { CourseQueryInput, CreateCourseInput, UpdateCourseInput } from "./course.types";
-import { CourseWhereInput } from '../../../generated/prisma/models/Course';
+import { Course, Prisma, PrismaClient } from "../../../generated/prisma/client.js";
+import { CourseQueryInput, CreateCourseInput, UpdateCourseInput } from "./course.types.js";
+import { CourseWhereInput } from '../../../generated/prisma/models/Course.js';
 
 export class CourseRepository {
     constructor(private readonly prisma: PrismaClient) { }

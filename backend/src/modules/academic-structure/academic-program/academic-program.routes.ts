@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { prisma } from '../../../database/prisma';
-import { AcademicProgramController } from './academic-program.controller';
-import { AcademicProgramService } from './academic-program.service';
-import { AcademicProgramRepository } from './academic-program.repository';
+import { prisma } from '../../../database/prisma.js';
+import { AcademicProgramController } from './academic-program.controller.js';
+import { AcademicProgramService } from './academic-program.service.js';
+import { AcademicProgramRepository } from './academic-program.repository.js';
 
 const router = Router();
 

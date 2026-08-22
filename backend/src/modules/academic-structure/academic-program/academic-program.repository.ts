@@ -1,5 +1,5 @@
-import { AcademicProgram, Prisma, PrismaClient } from '../../../generated/prisma/client';
-import { AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator';
+import { AcademicProgram, Prisma, PrismaClient } from '../../../generated/prisma/client.js';
+import { AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.validator.js';
 
 export class AcademicProgramRepository {
     constructor(private readonly prisma: PrismaClient) {}

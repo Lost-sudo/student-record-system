@@ -1,5 +1,5 @@
-import { CoursePrerequisite as PrismaCoursePrerequisite } from "../../../generated/prisma/client";
-import { CoursePrerequisiteQueryInput, CreateCoursePrerequisiteInput } from './course-prerequisite.validator';
+import { CoursePrerequisite as PrismaCoursePrerequisite } from "../../../generated/prisma/client.js";
+import { CoursePrerequisiteQueryInput, CreateCoursePrerequisiteInput } from './course-prerequisite.validator.js';
 
 export type CoursePrerequisiteDto = {
     id: PrismaCoursePrerequisite['id'],

@@ -1,5 +1,5 @@
-import { CoursePrerequisite, Prisma, PrismaClient } from '../../../generated/prisma/client';
-import { CoursePrerequisiteQueryInput, CreateCoursePrerequisiteInput } from './course-prerequisite.validator';
+import { CoursePrerequisite, Prisma, PrismaClient } from '../../../generated/prisma/client.js';
+import { CoursePrerequisiteQueryInput, CreateCoursePrerequisiteInput } from './course-prerequisite.validator.js';
 
 export class CoursePrerequisiteRepository {
     constructor(private readonly prisma: PrismaClient) {}

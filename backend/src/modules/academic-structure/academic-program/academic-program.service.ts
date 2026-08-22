@@ -1,9 +1,9 @@
-import { AcademicProgram } from '../../../generated/prisma/client';
-import { AppError, ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils';
-import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from '../../../utils/prisma-error.utils';
-import { PaginationMeta, buildPaginationMeta } from '../../../utils/pagination';
-import { AcademicProgramRepository } from './academic-program.repository';
-import { AcademicProgramDto, AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.types';
+import { AcademicProgram } from '../../../generated/prisma/client.js';
+import { AppError, ConflictError, InternalServerError, NotFoundError } from '../../../utils/error.utils.js';
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from '../../../utils/prisma-error.utils.js';
+import { PaginationMeta, buildPaginationMeta } from '../../../utils/pagination.js';
+import { AcademicProgramRepository } from './academic-program.repository.js';
+import { AcademicProgramDto, AcademicProgramQueryInput, CreateAcademicProgramInput, UpdateAcademicProgramInput } from './academic-program.types.js';
 
 export class AcademicProgramService {
     constructor(private readonly academicProgramRepository: AcademicProgramRepository) { }

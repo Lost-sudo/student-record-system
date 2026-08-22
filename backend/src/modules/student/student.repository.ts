@@ -1,5 +1,5 @@
-import { Student, Prisma, PrismaClient } from "../../generated/prisma/client";
-import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator";
+import { Student, Prisma, PrismaClient } from "../../generated/prisma/client.js";
+import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator.js";
 
 export class StudentRepository {
   constructor(private readonly prisma: PrismaClient) {}

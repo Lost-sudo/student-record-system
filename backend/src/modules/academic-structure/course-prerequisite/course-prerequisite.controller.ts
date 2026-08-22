@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../../utils/asyncHandler";
-import { CoursePrerequisiteService } from "./course-prerequisite.service";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { CoursePrerequisiteService } from "./course-prerequisite.service.js";
 import {
   coursePrerequisiteQuerySchema,
   createCoursePrerequisiteSchema,
-} from "./course-prerequisite.validator";
-import { uuidParamsSchema } from "../../../utils/zod";
+} from "./course-prerequisite.validator.js";
+import { uuidParamsSchema } from "../../../utils/zod.js";
 
 export class CoursePrerequisiteController {
   constructor(

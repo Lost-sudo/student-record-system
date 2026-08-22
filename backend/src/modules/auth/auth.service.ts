@@ -1,10 +1,10 @@
-import { prisma } from "../../database/prisma";
-import { hashPassword, comparePassword } from "../../utils/password.utils";
-import { generateTokenPair, verifyRefreshToken } from "../../utils/jwt.utils";
-import { AppError, ConflictError, UnauthorizedError, ForbiddenError, NotFoundError, InternalServerError } from "../../utils/error.utils";
-import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils";
-import { UserRole } from "../../generated/prisma/enums";
-import { AuthRepository } from "./auth.repository";
+import { prisma } from "../../database/prisma.js";
+import { hashPassword, comparePassword } from "../../utils/password.utils.js";
+import { generateTokenPair, verifyRefreshToken } from "../../utils/jwt.utils.js";
+import { AppError, ConflictError, UnauthorizedError, ForbiddenError, NotFoundError, InternalServerError } from "../../utils/error.utils.js";
+import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils.js";
+import { UserRole } from "../../generated/prisma/enums.js";
+import { AuthRepository } from "./auth.repository.js";
 
 export class AuthService {
   constructor(private readonly authRepository: AuthRepository) {}

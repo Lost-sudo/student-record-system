@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../utils/asyncHandler";
-import { DegreeRequirementService } from "./degree-requirement.service";
+import { asyncHandler } from "../../utils/asyncHandler.js";
+import { DegreeRequirementService } from "./degree-requirement.service.js";
 import {
   createDegreeRequirementSchema,
   degreeRequirementQuerySchema,
   updateDegreeRequirementSchema,
-} from "./degree-requirement.validator";
-import { uuidParamsSchema } from "../../utils/zod";
+} from "./degree-requirement.validator.js";
+import { uuidParamsSchema } from "../../utils/zod.js";
 
 export class DegreeRequirementController {
   constructor(

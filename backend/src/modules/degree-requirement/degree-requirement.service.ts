@@ -1,15 +1,15 @@
-import { CurriculumVersion } from "../../generated/prisma/client";
-import { ConflictError, NotFoundError } from "../../utils/error.utils";
-import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination";
-import { CourseRepository } from "../academic-structure/course/course.repository";
-import { CurriculumVersionRepository } from "../academic-structure/curriculum-version/curriculum-version.repository";
-import { DegreeRequirementRepository } from "./degree-requirement.repository";
-import { DegreeRequirementDto } from "./degree-requirement.types";
+import { CurriculumVersion } from "../../generated/prisma/client.js";
+import { ConflictError, NotFoundError } from "../../utils/error.utils.js";
+import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination.js";
+import { CourseRepository } from "../academic-structure/course/course.repository.js";
+import { CurriculumVersionRepository } from "../academic-structure/curriculum-version/curriculum-version.repository.js";
+import { DegreeRequirementRepository } from "./degree-requirement.repository.js";
+import { DegreeRequirementDto } from "./degree-requirement.types.js";
 import {
   CreateDegreeRequirementInput,
   DegreeRequirementQueryInput,
   UpdateDegreeRequirementInput,
-} from "./degree-requirement.validator";
+} from "./degree-requirement.validator.js";
 
 export class DegreeRequirementService {
   constructor(

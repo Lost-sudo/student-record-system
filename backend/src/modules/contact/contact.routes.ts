@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { prisma } from "../../database/prisma";
-import { authenticate, authorize } from "../../middlewares/auth.middleware";
-import { validate } from "../../middlewares/validate.middleware";
-import { ContactController } from "./contact.controller";
-import { ContactRepository } from "./contact.repository";
-import { ContactService } from "./contact.service";
-import { createContactInformationSchema, updateContactInformationSchema } from "./contact.validator";
+import { prisma } from "../../database/prisma.js";
+import { authenticate, authorize } from "../../middlewares/auth.middleware.js";
+import { validate } from "../../middlewares/validate.middleware.js";
+import { ContactController } from "./contact.controller.js";
+import { ContactRepository } from "./contact.repository.js";
+import { ContactService } from "./contact.service.js";
+import { createContactInformationSchema, updateContactInformationSchema } from "./contact.validator.js";
 
 const repository = new ContactRepository(prisma);
 const service = new ContactService(repository);

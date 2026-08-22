@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../../../utils/asyncHandler";
-import { AcademicTermService } from "./academic-term.service";
-import { academicTermQuerySchema, createAcademicTermSchema, updateAcademicTermSchema } from "./academic-term.validator";
-import { uuidParamsSchema } from "../../../utils/zod";
+import { asyncHandler } from "../../../utils/asyncHandler.js";
+import { AcademicTermService } from "./academic-term.service.js";
+import { academicTermQuerySchema, createAcademicTermSchema, updateAcademicTermSchema } from "./academic-term.validator.js";
+import { uuidParamsSchema } from "../../../utils/zod.js";
 
 export class AcademicTermController {
     constructor(private readonly academicTermService: AcademicTermService) { }

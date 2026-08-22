@@ -1,9 +1,9 @@
-import { Course } from "../../../generated/prisma/client";
-import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils";
-import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../../utils/prisma-error.utils";
-import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination";
-import { CourseRepository } from "./course.repository";
-import { CourseDto, CourseQueryInput, CreateCourseInput, UpdateCourseInput } from "./course.types";
+import { Course } from "../../../generated/prisma/client.js";
+import { AppError, BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../../utils/error.utils.js";
+import { isForeignKeyConstraintViolation, isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../../utils/prisma-error.utils.js";
+import { buildPaginationMeta, PaginationMeta } from "../../../utils/pagination.js";
+import { CourseRepository } from "./course.repository.js";
+import { CourseDto, CourseQueryInput, CreateCourseInput, UpdateCourseInput } from "./course.types.js";
 
 export class CourseService {
     constructor(private readonly courseRepository: CourseRepository) {}

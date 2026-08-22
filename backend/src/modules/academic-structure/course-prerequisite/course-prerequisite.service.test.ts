@@ -1,23 +1,23 @@
-import { prisma } from "../../../database/prisma";
+import { prisma } from "../../../database/prisma.js";
 import {
   BadRequestError,
   ConflictError,
   InternalServerError,
   NotFoundError,
-} from "../../../utils/error.utils";
-import { CourseRepository } from "../course/course.repository";
-import { CoursePrerequisiteRepository } from "./course-prerequisite.repository";
-import { CoursePrerequisiteService } from "./course-prerequisite.service";
-import { CreateCoursePrerequisiteInput } from "./course-prerequisite.validator";
+} from "../../../utils/error.utils.js";
+import { CourseRepository } from "../course/course.repository.js";
+import { CoursePrerequisiteRepository } from "./course-prerequisite.repository.js";
+import { CoursePrerequisiteService } from "./course-prerequisite.service.js";
+import { CreateCoursePrerequisiteInput } from "./course-prerequisite.validator.js";
 
-jest.mock("../../../utils/prisma-error.utils", () => ({
+jest.mock("../../../utils/prisma-error.utils.js", () => ({
   isPrismaKnownRequestError: (error: unknown) =>
     typeof (error as { code?: string } | null)?.code === "string",
   isUniqueConstraintViolation: (error: unknown) =>
     (error as { code?: string } | null)?.code === "P2002",
 }));
 
-jest.mock("../../../database/prisma", () => ({
+jest.mock("../../../database/prisma.js", () => ({
   prisma: {
     coursePrerequisite: {
       findFirst: jest.fn(),

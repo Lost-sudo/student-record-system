@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { prisma } from "../../database/prisma";
-import { authenticate } from "../../middlewares/auth.middleware";
-import { validate } from "../../middlewares/validate.middleware";
-import { AuthController } from "./auth.controller";
-import { AuthRepository } from "./auth.repository";
-import { AuthService } from "./auth.service";
-import { registerSchema, loginSchema, refreshTokenSchema } from "./auth.validator";
+import { prisma } from "../../database/prisma.js";
+import { authenticate } from "../../middlewares/auth.middleware.js";
+import { validate } from "../../middlewares/validate.middleware.js";
+import { AuthController } from "./auth.controller.js";
+import { AuthRepository } from "./auth.repository.js";
+import { AuthService } from "./auth.service.js";
+import { registerSchema, loginSchema, refreshTokenSchema } from "./auth.validator.js";
 
 const repository = new AuthRepository(prisma);
 const service = new AuthService(repository);
