@@ -32,18 +32,20 @@ function NavButton({ item }: NavButtonProps) {
         )
     : '';
 
+  const isExpanded = Boolean(isOpen || isActive);
+
   if (item.href && !item.submenu) {
     return (
       <Link
         href={item.href}
-        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
           isActive
-            ? "bg-indigo-500/10 border border-indigo-500/20 text-white"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+            ? "bg-indigo-500/10 border-indigo-500/20 text-white"
+            : "border-transparent text-slate-300 hover:bg-slate-800 hover:text-white"
         }`}
       >
         {item.icon}
-        <span>{item.label}</span>
+        <span className="whitespace-nowrap truncate">{item.label}</span>
       </Link>
     );
   }
@@ -52,18 +54,19 @@ function NavButton({ item }: NavButtonProps) {
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+        aria-expanded={isExpanded}
+        className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
           isActive
-            ? "bg-indigo-500/10 border border-indigo-500/20 text-white"
-            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+            ? "bg-indigo-500/10 border-indigo-500/20 text-white"
+            : "border-transparent text-slate-300 hover:bg-slate-800 hover:text-white"
         }`}
       >
-        <span className="flex items-center gap-3">
+        <span className="flex items-center gap-3 min-w-0">
           {item.icon}
-          <span>{item.label}</span>
+          <span className="whitespace-nowrap truncate">{item.label}</span>
         </span>
         <svg
-          className={`w-4 h-4 text-slate-400 transition-rotate ${isOpen ? "rotate-90" : ""}`}
+          className={`w-4 h-4 shrink-0 text-slate-400 transition-transform duration-300 ${isExpanded ? "rotate-90" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -78,7 +81,7 @@ function NavButton({ item }: NavButtonProps) {
       </button>
       {item.submenu && (
         <div
-          className={`submenu mt-1 ml-4 pl-4 border-l border-slate-700/50 space-y-1 ${isOpen || isActive ? "open" : ""}`}
+          className={`submenu mt-1 ml-4 pl-4 border-l border-slate-700/50 space-y-1 ${isExpanded ? "open" : ""}`}
         >
           {item.submenu.map((sub, idx) => {
             const isSubActive = sub.href === activeSubHref;
