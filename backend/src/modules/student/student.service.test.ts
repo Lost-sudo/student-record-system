@@ -19,6 +19,7 @@ jest.mock("../../database/prisma.js", () => ({
       create: jest.fn(),
       update: jest.fn(),
       count: jest.fn(),
+      groupBy: jest.fn(),
     },
     $transaction: jest.fn((arg: any) => {
       if (typeof arg === "function") {
@@ -42,6 +43,7 @@ const mockPrisma = prisma as unknown as {
     create: jest.Mock;
     update: jest.Mock;
     count: jest.Mock;
+    groupBy: jest.Mock;
   };
   $transaction: jest.Mock;
 };
@@ -386,6 +388,74 @@ describe("StudentService", () => {
       await expect(promise).rejects.toThrow("Student already deleted");
 
       expect(mockPrisma.student.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("getStats", () => {
+    it("should return active, new this week/month/last month and archived counts", async () => {
+      mockPrisma.student.count
+        .mockResolvedValueOnce(100) // total active
+        .mockResolvedValueOnce(4) // new this week
+        .mockResolvedValueOnce(12) // new this month
+        .mockResolvedValueOnce(9) // new last month
+        .mockResolvedValueOnce(34); // total archived
+      mockPrisma.student.groupBy
+        .mockResolvedValueOnce([
+          { gender: "male", _count: { _all: 60 } },
+          { gender: "female", _count: { _all: 38 } },
+          { gender: null, _count: { _all: 2 } },
+        ])
+        .mockResolvedValueOnce([
+          { nationality: "American", _count: { _all: 5 } },
+          { nationality: "FILIPINO", _count: { _all: 90 } },
+          { nationality: "filipino", _count: { _all: 5 } },
+          { nationality: null, _count: { _all: 0 } },
+        ]);
+
+      const result = await studentService.getStats();
+
+      expect(result).toEqual({
+        totalActiveStudents: 100,
+        newStudentsThisWeek: 4,
+        newStudentsThisMonth: 12,
+        newStudentsLastMonth: 9,
+        totalArchivedStudents: 34,
+        genderDistribution: [
+          { gender: "male", count: 60 },
+          { gender: "female", count: 38 },
+          { gender: null, count: 2 },
+        ],
+        nationalityDistribution: [
+          { nationality: "American", count: 5 },
+          { nationality: "FILIPINO", count: 90 },
+          { nationality: "filipino", count: 5 },
+          { nationality: null, count: 0 },
+        ],
+      });
+
+      expect(mockPrisma.student.count).toHaveBeenCalledTimes(5);
+      const whereClauses = mockPrisma.student.count.mock.calls.map(
+        ([args]: [{ where: Record<string, unknown> }]) => args.where,
+      );
+      expect(whereClauses[0]).toEqual({ deletedAt: null });
+      for (const clause of whereClauses.slice(1, 4)) {
+        expect(clause).toMatchObject({ deletedAt: null });
+        expect((clause as { createdAt?: unknown }).createdAt).toBeDefined();
+      }
+      expect(whereClauses[4]).toEqual({ deletedAt: { not: null } });
+
+      expect(mockPrisma.student.groupBy).toHaveBeenNthCalledWith(1, {
+        by: ["gender"],
+        where: { deletedAt: null },
+        _count: { _all: true },
+        orderBy: { gender: "asc" },
+      });
+      expect(mockPrisma.student.groupBy).toHaveBeenNthCalledWith(2, {
+        by: ["nationality"],
+        where: { deletedAt: null },
+        _count: { _all: true },
+        orderBy: { nationality: "asc" },
+      });
     });
   });
 });

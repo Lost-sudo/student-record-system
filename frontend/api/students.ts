@@ -64,6 +64,28 @@ export type PaginationMeta = {
 
 export type StudentsListResponse = ApiResponse<StudentDto[]> & { meta: PaginationMeta };
 
+export interface StudentGenderCountDto {
+  gender: string | null;
+  count: number;
+}
+
+export interface StudentNationalityCountDto {
+  nationality: string | null;
+  count: number;
+}
+
+export interface StudentStatsDto {
+  totalActiveStudents: number;
+  newStudentsThisWeek: number;
+  newStudentsThisMonth: number;
+  newStudentsLastMonth: number;
+  totalArchivedStudents: number;
+  genderDistribution: StudentGenderCountDto[];
+  nationalityDistribution: StudentNationalityCountDto[];
+}
+
+export type StudentsStatsResponse = ApiResponse<StudentStatsDto>;
+
 export type StudentDetailsData = {
   contactInfo: ContactInfoDto | null;
   emergencyContact: EmergencyContactDto[];
@@ -335,6 +357,21 @@ export const useArchivedStudents = (params?: { page?: number; limit?: number; se
       return res.data;
     },
   });
+};
+
+export const useStudentStats = () => {
+  return useQuery({
+    queryKey: ["students", "stats"],
+    queryFn: async () => {
+      const res = await apiClient.get<StudentsStatsResponse>("/students/stats");
+      return res.data.data;
+    },
+  });
+};
+
+export const monthOverMonthChange = (current: number, previous: number): number | null => {
+  if (previous <= 0) return null;
+  return Math.round(((current - previous) / previous) * 100);
 };
 
 export const useStudentContactDetails = (studentId: string | null) => {

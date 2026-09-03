@@ -42,6 +42,16 @@ export class StudentController {
     });
   });
 
+  getStudentStats = asyncHandler(async (_req: Request, res: Response) => {
+    const stats = await this.service.getStats();
+
+    return res.status(200).json({
+      success: true,
+      message: "Student stats fetched successfully",
+      data: stats,
+    });
+  });
+
   getStudentById = asyncHandler(async (req: Request, res: Response) => {
     const { id } = uuidParamsSchema.parse(req.params);
     const student = await this.service.getById(id);

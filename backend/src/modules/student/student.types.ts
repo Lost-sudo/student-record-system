@@ -17,6 +17,26 @@ export type StudentDto = {
   updatedAt: PrismaStudent["updatedAt"];
 };
 
+export type StudentGenderCount = {
+  gender: string | null;
+  count: number;
+};
+
+export type StudentNationalityCount = {
+  nationality: string | null;
+  count: number;
+};
+
+export type StudentStatsDto = {
+  totalActiveStudents: number;
+  newStudentsThisWeek: number;
+  newStudentsThisMonth: number;
+  newStudentsLastMonth: number;
+  totalArchivedStudents: number;
+  genderDistribution: StudentGenderCount[];
+  nationalityDistribution: StudentNationalityCount[];
+};
+
 export type PaginatedStudentResponse = {
   items: StudentDto[];
   total: number;

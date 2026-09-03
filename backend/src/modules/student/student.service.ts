@@ -3,7 +3,7 @@ import { AppError, BadRequestError, ConflictError, InternalServerError, NotFound
 import { isPrismaRecordNotFound, isUniqueConstraintViolation } from "../../utils/prisma-error.utils.js";
 import { buildPaginationMeta, PaginationMeta } from "../../utils/pagination.js";
 import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator.js";
-import { StudentDto } from "./student.types.js";
+import { StudentDto, StudentStatsDto } from "./student.types.js";
 import { StudentRepository } from "./student.repository.js";
 
 export class StudentService {
@@ -72,6 +72,10 @@ export class StudentService {
       page: result.meta.page,
       totalPages: result.meta.totalPages,
     };
+  }
+
+  async getStats(): Promise<StudentStatsDto> {
+    return this.studentRepository.getStats();
   }
 
   async getById(studentId: string): Promise<StudentDto> {
