@@ -1,5 +1,6 @@
 import { Student, Prisma, PrismaClient } from "../../generated/prisma/client.js";
 import { CreateStudentInput, StudentQueryInput, UpdateStudentInput } from "./student.validator.js";
+import { StudentStatsDto } from "./student.types.js";
 
 export class StudentRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -89,6 +90,75 @@ export class StudentRepository {
     ]);
 
     return { items, total };
+  }
+
+  async getStats(): Promise<StudentStatsDto> {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const daysSinceMonday = (now.getDay() + 6) % 7;
+    const startOfWeek = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() - daysSinceMonday,
+    );
+
+    const [
+      totalActiveStudents,
+      newStudentsThisWeek,
+      newStudentsThisMonth,
+      newStudentsLastMonth,
+      totalArchivedStudents,
+    ] = await this.prisma.$transaction([
+      this.prisma.student.count({ where: { deletedAt: null } }),
+      this.prisma.student.count({
+        where: { deletedAt: null, createdAt: { gte: startOfWeek } },
+      }),
+      this.prisma.student.count({
+        where: { deletedAt: null, createdAt: { gte: startOfMonth } },
+      }),
+      this.prisma.student.count({
+        where: {
+          deletedAt: null,
+          createdAt: { gte: startOfLastMonth, lt: startOfMonth },
+        },
+      }),
+      this.prisma.student.count({ where: { deletedAt: { not: null } } }),
+    ]);
+
+    const genderGroups = await this.prisma.student.groupBy({
+      by: ["gender"],
+      where: { deletedAt: null },
+      _count: { _all: true },
+      orderBy: { gender: "asc" },
+    });
+
+    const nationalityGroups = await this.prisma.student.groupBy({
+      by: ["nationality"],
+      where: { deletedAt: null },
+      _count: { _all: true },
+      orderBy: { nationality: "asc" },
+    });
+
+    const genderDistribution = genderGroups.map((group) => ({
+      gender: group.gender,
+      count: group._count._all,
+    }));
+
+    const nationalityDistribution = nationalityGroups.map((group) => ({
+      nationality: group.nationality,
+      count: group._count._all,
+    }));
+
+    return {
+      totalActiveStudents,
+      newStudentsThisWeek,
+      newStudentsThisMonth,
+      newStudentsLastMonth,
+      totalArchivedStudents,
+      genderDistribution,
+      nationalityDistribution,
+    };
   }
 
   async findMany(params: StudentQueryInput): Promise<{ items: Student[]; total: number }> {
